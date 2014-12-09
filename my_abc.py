@@ -11,16 +11,15 @@ import clustering
 import logging
 import matplotlib.pyplot as plt
 
-
 logging.basicConfig(filename='my_abc_scan.log', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
 
 def central():
     logging.info('ABC started')
     start = time.time()
     number_particles = float(read_input.number_particles)
     number_to_sample = 1000
+    init_cond_to_sample = 100
     logger.debug('number of particles: %s', number_particles)
     logger.debug('number_to_sample: %s', number_to_sample)
     pop_indic = 0
@@ -46,11 +45,10 @@ def central():
         logger.debug('epsilon_vcl_current: %s', epsilon_vcl_current)
         logger.debug('epsilon_cl_current: %s', epsilon_cl_current)
 
-
         while finished == 'false':
             parameters_sampled = sample_priors(number_to_sample)
-            cudasim_result = simulate_dataset(parameters_sampled, number_to_sample)
-            distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values)
+            cudasim_result = simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample)
+            distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample)
             parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, parameters_sampled, epsilons)
             for i in parameters_sampled:
                 parameters_accepted.append(i)
@@ -91,8 +89,8 @@ def central():
         while finished == 'false':
             parameters_sampled, current_sampled_weights = sample_params(previous_parameters, previous_weights_list, number_to_sample)
             perturbed_particles, previous_weights_list = perturb_particles(parameters_sampled, current_sampled_weights, pop_indic)
-            cudasim_result = simulate_dataset(perturbed_particles, number_to_sample)
-            distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values)
+            cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample)
+            distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample)
             parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, perturbed_particles, epsilons)
             # Append the accepted ones to a matrix which will be built up until you reach the number of particles you want
             for i in parameters_sampled:
@@ -206,7 +204,7 @@ def sample_params(parameters_accepted, current_weights_list, number_to_sample):
     return parameters_list, weights_val_list
 
 
-def simulate_dataset(parameters_sampled, number_to_sample):
+def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
        
     init_cond_list = []
     number_species = len(read_input.ics)
@@ -222,11 +220,9 @@ def simulate_dataset(parameters_sampled, number_to_sample):
             if j == 100:
                 break
 
-    init_cond_list = sampl_initi_condit.sample_init(number_species, number_to_sample)
-    len_list = len(expanded_params_list)
-    len_list_i = len(init_cond_list)
-    logger.debug('Length of expanded parameters list: %s', len_list)
-    logger.debug('Length of initial conditions list: %s', len_list_i)
+    init_cond_list = sampl_initi_condit.sample_init(number_species, number_to_sample, init_cond_to_sample)
+    logger.debug('Length of expanded parameters list: %s', len(expanded_params_list))
+    logger.debug('Length of initial conditions list: %s', len(init_cond_list))
              
     """    Simulate dataset """
     ###############	Create cuda code of model	###########
@@ -255,7 +251,7 @@ def simulate_dataset(parameters_sampled, number_to_sample):
     return cudasim_result
 
 
-def measure_distance(cudasim_result, number_to_sample, final_desired_values ):
+def measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample):
 
     logger.info('Distance module called')
     #Break up the simulated data sets into the parameter sets
@@ -265,27 +261,39 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values ):
     distances_matrix = []
     g = 0
     f = 0
-    f = 0
-    while g <= (int(number_to_sample)*100):
-        parameter_set = []
-        j = 0
-        if g == (int(number_to_sample)*100):
-            break
 
-        while j <= 100:
-            #I only want the last point of the timecourse
-            parameter_set.append([timecourseA2[g+j][-1], timecourseB2[g+j][-1]])
-            j += 1
-            if j == 100:
-                #now call the distance function for this group
-                cluster_counter, clusters_means, total_variance, median_clust_var = clustering.distance(parameter_set)
-                cl_c.append(cluster_counter)
-                var_t.append(total_variance)
-                var_c.append(median_clust_var)
-                distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2])])
-                g += 100
-                f += 1
-                break
+    for i in range(0, int(number_to_sample)):
+        range_start = i*init_cond_to_sample
+        range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample)
+        set_result = cudasim_result[range_start, range_end][0][:]
+        cluster_counter, clusters_means, total_variance, median_clust_var = clustering.distance(set_result)
+        cl_c.append(cluster_counter)
+        var_t.append(total_variance)
+        var_c.append(median_clust_var)
+        distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2])])
+
+
+
+    #while g <= (int(number_to_sample)*100):
+    #    parameter_set = []
+    #    j = 0
+    #    if g == (int(number_to_sample)*100):
+    #        break
+
+    #    while j <= 100:
+    #        #I only want the last point of the timecourse
+    #        parameter_set.append([timecourseA2[g+j][-1], timecourseB2[g+j][-1]])
+    #        j += 1
+    #        if j == 100:
+    #            #now call the distance function for this group
+    #            cluster_counter, clusters_means, total_variance, median_clust_var = clustering.distance(parameter_set)
+    #            cl_c.append(cluster_counter)
+    #            var_t.append(total_variance)
+    ##            var_c.append(median_clust_var)
+    #            distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2])])
+    #            g += 100
+    #            f += 1
+    #            break
     logger.debug('Length of distances matrix: %s', len(distances_matrix))
     logger.debug('Length of clusters list: %s', len(cl_c))
     return distances_matrix

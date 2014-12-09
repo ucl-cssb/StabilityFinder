@@ -1,8 +1,8 @@
 import random
 from numpy import *
 
-def sample_init(number_species, number_to_sample):
-    init_codit_matrix = zeros([100, int(number_species)])
+def sample_init(number_species, number_to_sample, init_cond_to_sample):
+    init_codit_matrix = zeros([int(init_cond_to_sample), int(number_species)])
     init_cond_total_matrix = []
     #init_conds = []
     global_min_A2 = 0
