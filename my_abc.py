@@ -69,7 +69,7 @@ def central():
                 logger.info('accepted_distances: %s', accepted_distances)
                 logger.info('param_acc length: %s', len(parameters_accepted))
                 break
-        fig = plot_steady_states(cudasim_result, pop_indic, number_particles)
+        fig = plot_steady_states(cudasim_result, pop_indic, number_particles, init_cond_to_sample)
         current_weights_list = particle_weights(parameters_accepted, current_weights_list)
         numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Population'+str(pop_indic+1)+'.txt', parameters_accepted, delimiter=' ')
         numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Weights'+str(pop_indic+1)+'.txt', current_weights_list, delimiter=' ')
@@ -110,7 +110,7 @@ def central():
             if finished == 'true':
                 break
 
-        fig = plot_steady_states(cudasim_result, pop_indic, number_particles)
+        fig = plot_steady_states(cudasim_result, pop_indic, number_particles, init_cond_to_sample)
         current_weights_list = perturbed_particle_weights(parameters_accepted, previous_weights_list, previous_parameters)
         numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Population'+str(pop_indic+1)+'.txt', parameters_accepted, delimiter=' ')
         numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Weights'+str(pop_indic+1)+'.txt', current_weights_list, delimiter=' ')
@@ -265,7 +265,8 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
     for i in range(0, int(number_to_sample)):
         range_start = i*int(init_cond_to_sample)
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample)
-        set_result = cudasim_result[range_start, range_end][0][:]
+        #[#threads][#beta][#timepoints][#speciesNumber]
+        set_result = cudasim_result[range_start, range_end][0][-1][4, 5]
 
         cluster_counter, clusters_means, total_variance, median_clust_var = clustering.distance(set_result)
         cl_c.append(cluster_counter)
@@ -293,44 +294,58 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
     #            g += 100
     #            f += 1
     #            break
+
     logger.debug('Length of distances matrix: %s', len(distances_matrix))
     logger.debug('Length of clusters list: %s', len(cl_c))
     return distances_matrix
 
 
-def plot_steady_states(cudasim_result, pop_indic, number_to_sample):
-    a2 = []
-    b2 = []
-    for i in timecourseA2:
-        a2.append(i[-1])
-    for i in timecourseB2:
-        b2.append(i[-1])
-    fig, axs = plt.subplots(10, 10, figsize=(30, 20), facecolor='w', edgecolor='k')
+def plot_steady_states(cudasim_result, pop_indic, number_to_sample, init_cond_to_sample):
+    #[#threads][#beta][#timepoints][#speciesNumber]
+
+    fig, axs = plt.subplots(5, 2, figsize=(30, 20), facecolor='w', edgecolor='k')
     fig.subplots_adjust(hspace=.5, wspace=0.1)
     axs = axs.ravel()
-    p_set = 0
-    i = 0
-    while p_set <= int(number_to_sample)-1:
-        a2_set = []
-        b2_set = []
-        tot = 0
-        if i == int(number_to_sample)*100:
-            break
-        if p_set == int(number_to_sample)-1:
-            break
-        while tot <= 101:
-            if i == int(number_to_sample)*100:
-                break
-            axs[p_set].scatter(a2[i], b2[i], color='blue')
-            a2_set.append(a2[i])
-            b2_set.append(b2[i])
-            i += 1
-            tot += 1
-            if tot == 100:
-            #    numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/A2_plotting_data_set'+str(p_set)+'.txt', a2_set, delimiter=' ')
-            #    numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/B2_plotting_data_set'+str(p_set)+'.txt', b2_set, delimiter=' ')
-                p_set += 1
-                break
+
+    for i in range(0, int(number_to_sample)):
+        range_start = i*int(init_cond_to_sample)
+        range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample)
+        set_result = cudasim_result[range_start, range_end][0][-1][4, 5]
+        for j in set_result:
+            axs[i].scatter(j[0], j[1], color='blue')
+
+    #a2 = []
+    #b2 = []
+    #for i in timecourseA2:
+    #    a2.append(i[-1])
+    #for i in timecourseB2:
+    #    b2.append(i[-1])
+    #fig, axs = plt.subplots(10, 10, figsize=(30, 20), facecolor='w', edgecolor='k')
+    #fig.subplots_adjust(hspace=.5, wspace=0.1)
+    #axs = axs.ravel()
+    #p_set = 0
+    #i = 0
+    #while p_set <= int(number_to_sample)-1:
+    #    a2_set = []
+    ##    b2_set = []
+    #    tot = 0
+    #    if i == int(number_to_sample)*100:
+    #        break
+    #    if p_set == int(number_to_sample)-1:
+    #        break
+    #    while tot <= 101:
+    #        if i == int(number_to_sample)*100:
+    #            break
+    #        axs[p_set].scatter(a2[i], b2[i], color='blue')
+    #        a2_set.append(a2[i])
+    #        b2_set.append(b2[i])
+    #        i += 1
+    #        tot += 1
+    #        if tot == 100:
+    #        #    numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/A2_plotting_data_set'+str(p_set)+'.txt', a2_set, delimiter=' ')
+    #        #    numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/B2_plotting_data_set'+str(p_set)+'.txt', b2_set, delimiter=' ')
+    #            p_set += 1
+    #            break
     #numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/A2_plotting_data_all.txt', a2, delimiter=' ')
     #numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/B2_plotting_data_all.txt', b2, delimiter=' ')
     plt.savefig('plot_population_'+str(pop_indic+1)+'.pdf', bbox_inches=0)
