@@ -27,7 +27,13 @@ cluster_variance = cluster_variances.split( )
 
 time = root.find('times').text
 times = time.split( )
+
+species_numb_to_fit = root.find('species_numb_to_fit').text
+species_numb_to_fit_lst = species_numb_to_fit.split( )
+
 number_particles = root.find('particles').text
+number_to_sample = root.find('number_to_sample').text
+initial_conditions_samples = root.find('initial_conditions_samples').text
 source = root.find('source').text
 fit = root.find('fit').text
 
