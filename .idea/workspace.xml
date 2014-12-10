@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d96ebde6-a1ae-410a-b8cb-e1bfc4de0748" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/input_file.xml" afterPath="$PROJECT_DIR$/input_file.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/my_abc.py" afterPath="$PROJECT_DIR$/my_abc.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
@@ -30,8 +29,8 @@
       <file leaf-file-name="my_abc.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/my_abc.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.46255508" vertical-offset="735" max-vertical-offset="6405">
-              <caret line="77" column="53" selection-start-line="77" selection-start-column="53" selection-end-line="77" selection-end-column="53" />
+            <state vertical-scroll-proportion="0.8513216" vertical-offset="5287" max-vertical-offset="6195">
+              <caret line="404" column="68" selection-start-line="404" selection-start-column="68" selection-end-line="404" selection-end-column="68" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
               </folding>
@@ -84,8 +83,8 @@
       <list>
         <option value="$PROJECT_DIR$/sampl_initi_condit.py" />
         <option value="$PROJECT_DIR$/read_input.py" />
-        <option value="$PROJECT_DIR$/my_abc.py" />
         <option value="$PROJECT_DIR$/input_file.xml" />
+        <option value="$PROJECT_DIR$/my_abc.py" />
       </list>
     </option>
   </component>
@@ -310,7 +309,11 @@
       <created>1418238418228</created>
       <updated>1418238418228</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="making it variable not tested&#10;">
+      <created>1418238499297</created>
+      <updated>1418238499297</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -390,8 +393,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/my_abc.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.46255508" vertical-offset="735" max-vertical-offset="6405">
-          <caret line="77" column="53" selection-start-line="77" selection-start-column="53" selection-end-line="77" selection-end-column="53" />
+        <state vertical-scroll-proportion="0.8513216" vertical-offset="5287" max-vertical-offset="6195">
+          <caret line="404" column="68" selection-start-line="404" selection-start-column="68" selection-end-line="404" selection-end-column="68" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>

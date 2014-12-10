@@ -81,8 +81,6 @@ def central():
         pop_indic += 1
               
     while epsilons[0] > epsilons_final[0] or epsilons[1] > epsilons_final[1] or epsilons[2] > epsilons_final[2]:
-        timecourseA2 = []
-        timecourseB2 = []
         finished = 'false'
         logger.info('population: %s', pop_indic)
         logger.info('population: %s', pop_indic)
@@ -186,15 +184,11 @@ def sample_params(parameters_accepted, current_weights_list, number_to_sample):
         return i
        
     weights_val_list = []
-    partic_indic = 0
     weight_index_list = []
     parameters_list = []
-    while partic_indic < number_to_sample:
+    for partic_indic in range(0, number_to_sample):
         sample = choose_sample(current_weights_list)
         weight_index_list.append(sample)
-        partic_indic += 1
-        if partic_indic == number_to_sample:
-            break
     for index in weight_index_list:
         weight_val = current_weights_list[index]
         weights_val_list.append(weight_val)
@@ -329,8 +323,7 @@ def perturb_particles(parameters_sampled,current_weights_list,pop_indic):
     perturbed_particles = []
     for particle in not_perturbed_particles:
         part_params = []
-        i = 0
-        while i < len(particle):
+        for i in range(0, len(particle)):
             if i == 0:
                 part_params.append(1.0)
                 i += 1
@@ -354,7 +347,6 @@ def perturb_particles(parameters_sampled,current_weights_list,pop_indic):
                                    
             if i == len(particle):
                 perturbed_particles.append(part_params)
-                break
     logger.info('Perturbation finished')
     #logger.debug('perturbed_particles matrix: %s', perturbed_particles)
     return perturbed_particles, current_weights_list
@@ -374,21 +366,18 @@ def perturbed_particle_weights(parameters_accepted, prev_weights_list, previous_
     current_weights_list = []
     """ numerator """
     num_tmp = []
-    i = 1
-    while i < len(read_input.lims):
+    for i in range(1, len(read_input.lims)):
         numerator = 0
         minimum_pert = float(read_input.lims[i][1])
         maximum_pert = float(read_input.lims[i][2])
         numer = 1/(maximum_pert-minimum_pert)
         num_tmp.append(numer)
-        i += 1
     numerator = reduce(operator.mul, num_tmp, 1)
     """ denominator """
     for particle in range(len(parameters_accepted)):
         #Calculate the probability for each parameter of the particle
-        paramet = 1
         params_denom = []
-        while paramet < len(read_input.lims):
+        for paramet in range(1, len(read_input.lims)):
             denominator_tmp = []
             minimum_prev = min(param[paramet] for param in previous_parameters)
             maximum_prev = max(param[paramet] for param in previous_parameters)
@@ -396,9 +385,6 @@ def perturbed_particle_weights(parameters_accepted, prev_weights_list, previous_
             for prev_particle in range(len(previous_parameters)):
                 denominator_tmp.append(uniform_pdf(parameters_accepted[particle][paramet], previous_parameters[prev_particle][paramet]-delta, previous_parameters[prev_particle][paramet]+delta))
             params_denom.append(sum(denominator_tmp))
-            paramet += 1
-            if paramet == len(read_input.lims):
-                break
 
         #reduce calculates the cumulative sum from left to to right.
         #operator.mul multiplies
@@ -416,6 +402,6 @@ def perturbed_particle_weights(parameters_accepted, prev_weights_list, previous_
     return current_weights_list
 
 
-final_weights, final_particles, final_timecoursesA2, final_timecoursesB2 = central()
+final_weights, final_particles, final_timecourse1, final_timecourse2 = central()
 numpy.savetxt('Parameter_values_final.txt', final_particles, delimiter=' ')
 numpy.savetxt('Parameter_weights_final.txt', final_weights, delimiter=' ')
