@@ -18,7 +18,7 @@ def central():
     logging.info('ABC started')
     start = time.time()
     number_particles = float(read_input.number_particles)
-    number_to_sample = 1000
+    number_to_sample = 10
     init_cond_to_sample = 100
     logger.debug('number of particles: %s', number_particles)
     logger.debug('number_to_sample: %s', number_to_sample)
@@ -263,16 +263,15 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
     f = 0
 
     for i in range(0, int(number_to_sample)):
-        range_start = i*init_cond_to_sample
+        range_start = i*int(init_cond_to_sample)
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample)
         set_result = cudasim_result[range_start, range_end][0][:]
+
         cluster_counter, clusters_means, total_variance, median_clust_var = clustering.distance(set_result)
         cl_c.append(cluster_counter)
         var_t.append(total_variance)
         var_c.append(median_clust_var)
         distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2])])
-
-
 
     #while g <= (int(number_to_sample)*100):
     #    parameter_set = []
