@@ -216,13 +216,8 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
     expanded_params_list = []
     logger.info('Expanding parameters list to match initial conditions')
     for i in parameters_sampled:
-        j = 0
-        while j <= len(init_cond_to_sample):
+        for j in range(0, len(init_cond_to_sample)):
             expanded_params_list.append(i)
-            j += 1
-            if j == len(init_cond_to_sample):
-                break
-
     init_cond_list = sampl_initi_condit.sample_init(number_species, number_to_sample, init_cond_to_sample)
     logger.debug('Length of expanded parameters list: %s', len(expanded_params_list))
     logger.debug('Length of initial conditions list: %s', len(init_cond_list))

@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d96ebde6-a1ae-410a-b8cb-e1bfc4de0748" name="Default" comment="making measure_distaance more general, to test">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/results_txt_files/Population_1/data_Population1.txt" afterPath="$PROJECT_DIR$/results_txt_files/Population_1/data_Population1.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/results_txt_files/Population_1/data_Weights1.txt" afterPath="$PROJECT_DIR$/results_txt_files/Population_1/data_Weights1.txt" />
+    <list default="true" id="d96ebde6-a1ae-410a-b8cb-e1bfc4de0748" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/input_file.xml" afterPath="$PROJECT_DIR$/input_file.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/my_abc.py" afterPath="$PROJECT_DIR$/my_abc.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/read_input.py" afterPath="$PROJECT_DIR$/read_input.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="scanning_ABC_SMC.iws" />
@@ -33,8 +30,8 @@
       <file leaf-file-name="my_abc.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/my_abc.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.57819384" vertical-offset="2805" max-vertical-offset="6480">
-              <caret line="222" column="24" selection-start-line="222" selection-start-column="24" selection-end-line="222" selection-end-column="24" />
+            <state vertical-scroll-proportion="0.46255508" vertical-offset="735" max-vertical-offset="6405">
+              <caret line="77" column="53" selection-start-line="77" selection-start-column="53" selection-end-line="77" selection-end-column="53" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
               </folding>
@@ -56,7 +53,7 @@
         <entry file="file://$PROJECT_DIR$/input_file.xml">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="825">
-              <caret line="15" column="47" selection-start-line="15" selection-start-column="28" selection-end-line="15" selection-end-column="47" />
+              <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -86,9 +83,9 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/sampl_initi_condit.py" />
-        <option value="$PROJECT_DIR$/input_file.xml" />
         <option value="$PROJECT_DIR$/read_input.py" />
         <option value="$PROJECT_DIR$/my_abc.py" />
+        <option value="$PROJECT_DIR$/input_file.xml" />
       </list>
     </option>
   </component>
@@ -309,7 +306,11 @@
       <created>1418214220754</created>
       <updated>1418214220754</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="making it variable not tested&#10;">
+      <created>1418238418228</created>
+      <updated>1418238418228</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -354,7 +355,8 @@
     <MESSAGE value="cleanup1" />
     <MESSAGE value="making measure_distaance more general, havent tested it yet!!" />
     <MESSAGE value="making measure_distaance more general, to test" />
-    <option name="LAST_COMMIT_MESSAGE" value="making measure_distaance more general, to test" />
+    <MESSAGE value="making it variable not tested&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="making it variable not tested&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -370,6 +372,14 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/input_file.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="825">
+          <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/read_input.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1275">
@@ -378,18 +388,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/input_file.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="825">
-          <caret line="15" column="47" selection-start-line="15" selection-start-column="28" selection-end-line="15" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/my_abc.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.57819384" vertical-offset="2805" max-vertical-offset="6480">
-          <caret line="222" column="24" selection-start-line="222" selection-start-column="24" selection-end-line="222" selection-end-column="24" />
+        <state vertical-scroll-proportion="0.46255508" vertical-offset="735" max-vertical-offset="6405">
+          <caret line="77" column="53" selection-start-line="77" selection-start-column="53" selection-end-line="77" selection-end-column="53" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>
