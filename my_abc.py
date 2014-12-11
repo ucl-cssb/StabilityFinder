@@ -21,11 +21,11 @@ def central():
     number_particles = int(read_input.number_particles)
     number_to_sample = int(read_input.number_to_sample)
     init_cond_to_sample = int(read_input.initial_conditions_samples)
-    alpha = math.ceil(int(read_input.alpha)*number_particles)
+    alpha = math.ceil(float(read_input.alpha)*number_particles)
     species_numb_to_fit = read_input.species_numb_to_fit_lst
     logger.debug('number of particles: %s', number_particles)
     logger.debug('number_to_sample: %s', number_to_sample)
-    logger.debug('species_numb_to_fit', species_numb_to_fit)
+    logger.debug('species_numb_to_fit: %s', species_numb_to_fit)
 
     pop_indic = 0
     current_weights_list = []
@@ -87,7 +87,15 @@ def central():
 
         while finished == 'false':
             parameters_sampled, current_sampled_weights = sample_params(previous_parameters, previous_weights_list, number_to_sample)
+
+
+            for i in parameters_sampled:
+                logger.debug('parameters_sampled 1: %s', len(i))
+
             perturbed_particles, previous_weights_list = perturb_particles(parameters_sampled, current_sampled_weights, pop_indic)
+            for i in parameters_sampled:
+                logger.debug('parameters_sampled 2: %s', len(i))
+
             cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample)
             distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample)
             parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, perturbed_particles, epsilons)
@@ -132,9 +140,9 @@ def prepare_next_pop(parameters_accepted, current_weights_list, distances_matrix
     logger.info('Preparing next population')
     logger.debug('distances matrix: %s', distances_matrix)
     distances_matrix.sort(key=operator.itemgetter(0, 1, 2))
-    epsilon_cl_current = distances_matrix[alpha][0]
-    epsilon_t_current = distances_matrix[alpha][1]
-    epsilon_vcl_current = distances_matrix[alpha][2]
+    epsilon_cl_current = distances_matrix[int(alpha)][0]
+    epsilon_t_current = distances_matrix[int(alpha)][1]
+    epsilon_vcl_current = distances_matrix[int(alpha)][2]
     epsilons = [epsilon_cl_current, epsilon_t_current, epsilon_vcl_current]
     logger.debug('epsilons: %s', epsilons)
 
@@ -159,7 +167,6 @@ def sample_priors(number_to_sample):
     len_list = len(parameters_list)
     logger.debug('Number of parameter sets sampled: %s', len_list)
     return parameters_list
-
 
 def sample_params(parameters_accepted, current_weights_list, number_to_sample):
     logger.info('sampling particles from previous population')
@@ -194,10 +201,12 @@ def sample_params(parameters_accepted, current_weights_list, number_to_sample):
         weights_val_list.append(weight_val)
         param = parameters_accepted[index]
         parameters_list.append(param)
+    for i in parameters_list:
+        logger.debug('parameters list: %s', len(i))
     logger.debug('Number of particles sampled: %s', len(parameters_list))
     logger.debug('Number of particle weights: %s', len(weights_val_list))
-    print parameters_list
     return parameters_list, weights_val_list
+
 
 
 def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
@@ -207,6 +216,8 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
     #Here multiply the 'parameters' martix, to repeat each line 100 times, keeping the same order. this is so that the initial conditions and parameters matrices are equal.
     #There are 100 initial conditions per parameter set
     expanded_params_list = []
+    for i in parameters_sampled:
+        logger.debug('parameters_sampled: %s', len(i))
     logger.info('Expanding parameters list to match initial conditions')
     for i in parameters_sampled:
         for j in range(0, init_cond_to_sample):
