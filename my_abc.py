@@ -17,12 +17,10 @@ logger = logging.getLogger(__name__)
 def central():
     logging.info('ABC started')
     start = time.time()
-    number_particles = float(read_input.number_particles)
-
+    number_particles = int(read_input.number_particles)
     number_to_sample = int(read_input.number_to_sample)
     init_cond_to_sample = int(read_input.initial_conditions_samples)
     species_numb_to_fit = read_input.species_numb_to_fit_lst
-
     logger.debug('number of particles: %s', number_particles)
     logger.debug('number_to_sample: %s', number_to_sample)
     logger.debug('species_numb_to_fit', species_numb_to_fit)
@@ -111,8 +109,8 @@ def central():
 
         fig = plot_steady_states(cudasim_result, pop_indic, number_particles, init_cond_to_sample)
         current_weights_list = perturbed_particle_weights(parameters_accepted, previous_weights_list, previous_parameters)
-        numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Population'+str(pop_indic+1)+'.txt', parameters_accepted, delimiter=' ')
-        numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Weights'+str(pop_indic+1)+'.txt', current_weights_list, delimiter=' ')
+        #numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Population'+str(pop_indic+1)+'.txt', parameters_accepted, delimiter=' ')
+        #numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Weights'+str(pop_indic+1)+'.txt', current_weights_list, delimiter=' ')
         pop_indic += 1
               
         if epsilons[0] <= epsilons_final[0] and epsilons[1] <= epsilons_final[1] and epsilons[2] <= epsilons_final[2]:
@@ -131,7 +129,7 @@ def central():
 def prepare_next_pop(parameters_accepted, current_weights_list, distances_matrix):
     logger.info('Preparing next population')
     logger.debug('distances matrix: %s', distances_matrix)
-    distances_matrix.sort(key = operator.itemgetter(0, 1, 2))
+    distances_matrix.sort(key=operator.itemgetter(0, 1, 2))
     epsilon_cl_current = distances_matrix[9][0]
     epsilon_t_current = distances_matrix[9][1]
     epsilon_vcl_current = distances_matrix[9][2]
@@ -178,22 +176,25 @@ def sample_params(parameters_accepted, current_weights_list, number_to_sample):
             n = n - current_weights_list[i]
             #Great, you've got your -!
         return i
-       
+
     weights_val_list = []
+    partic_indic = 0
     weight_index_list = []
     parameters_list = []
-    for partic_indic in range(0, number_to_sample):
+    while partic_indic < number_to_sample:
         sample = choose_sample(current_weights_list)
         weight_index_list.append(sample)
+        partic_indic += 1
+        if partic_indic == number_to_sample:
+            break
     for index in weight_index_list:
         weight_val = current_weights_list[index]
         weights_val_list.append(weight_val)
         param = parameters_accepted[index]
         parameters_list.append(param)
-    len_list = len(parameters_list)
-    len_list_w = len(weights_val_list)
-    logger.debug('Number of particles sampled: %s', len_list)
-    logger.debug('Number of particle weights: %s', len_list_w)
+    logger.debug('Number of particles sampled: %s', len(parameters_list))
+    logger.debug('Number of particle weights: %s', len(weights_val_list))
+    print parameters_list
     return parameters_list, weights_val_list
 
 
@@ -206,8 +207,9 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
     expanded_params_list = []
     logger.info('Expanding parameters list to match initial conditions')
     for i in parameters_sampled:
-        for j in range(0, len(init_cond_to_sample)):
+        for j in range(0, init_cond_to_sample):
             expanded_params_list.append(i)
+
     init_cond_list = sampl_initi_condit.sample_init(number_species, number_to_sample, init_cond_to_sample)
     logger.debug('Length of expanded parameters list: %s', len(expanded_params_list))
     logger.debug('Length of initial conditions list: %s', len(init_cond_list))
@@ -259,7 +261,7 @@ def plot_steady_states(cudasim_result, pop_indic, number_to_sample, init_cond_to
     for i in range(0, int(number_to_sample)):
         range_start = i*int(init_cond_to_sample)
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample)
-        set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0]):int(species_numb_to_fit[1]) + 1]
+        set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0]):int(species_numb_to_fit[1])+1]
         for j in set_result:
             axs[i].scatter(j[0], j[1], color='blue')
     plt.savefig('plot_population_'+str(pop_indic+1)+'.pdf', bbox_inches=0)

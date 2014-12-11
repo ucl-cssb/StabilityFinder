@@ -10,8 +10,8 @@
 <total_variance> 0.001 0.4 </total_variance>
 <cluster_variance> 100 0.004 </cluster_variance>
 
-<particles>11</particles>
-<number_to_sample> 20 </number_to_sample>
+<particles> 5 </particles>
+<number_to_sample> 10 </number_to_sample>
 <initial_conditions_samples> 100 </initial_conditions_samples>
 <species_numb_to_fit> 4 5 </species_numb_to_fit>
 <times>0 100</times>
