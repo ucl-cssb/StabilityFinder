@@ -11,10 +11,10 @@
 <cluster_variance> 100 0.004 </cluster_variance>
 
 <particles>11</particles>
-<number_to_sample> 100 </number_to_sample>
+<number_to_sample> 20 </number_to_sample>
 <initial_conditions_samples> 100 </initial_conditions_samples>
 <species_numb_to_fit> 4 5 </species_numb_to_fit>
-<times>0 10 20 30 40 50 60 70 80 90 100</times>
+<times>0 100</times>
 
 <source> model_sbml.xml </source>
 <fit> species6 </fit>

@@ -46,9 +46,7 @@ def central():
         epsilon_cl_current = float(read_input.epsilon_cl[0])
         epsilons = [epsilon_cl_current, epsilon_t_current, epsilon_vcl_current]
 
-        logger.debug('epsilon_t_current: %s', epsilon_t_current)
-        logger.debug('epsilon_vcl_current: %s', epsilon_vcl_current)
-        logger.debug('epsilon_cl_current: %s', epsilon_cl_current)
+        logger.debug('epsilons: %s', epsilons)
 
         while finished == 'false':
             parameters_sampled = sample_priors(number_to_sample)
@@ -76,16 +74,14 @@ def central():
                 break
         fig = plot_steady_states(cudasim_result, pop_indic, number_particles, init_cond_to_sample, species_numb_to_fit)
         current_weights_list = particle_weights(parameters_accepted, current_weights_list)
-        numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Population'+str(pop_indic+1)+'.txt', parameters_accepted, delimiter=' ')
-        numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Weights'+str(pop_indic+1)+'.txt', current_weights_list, delimiter=' ')
+        #numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Population'+str(pop_indic+1)+'.txt', parameters_accepted, delimiter=' ')
+        #numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Weights'+str(pop_indic+1)+'.txt', current_weights_list, delimiter=' ')
         pop_indic += 1
               
     while epsilons[0] > epsilons_final[0] or epsilons[1] > epsilons_final[1] or epsilons[2] > epsilons_final[2]:
         finished = 'false'
         logger.info('population: %s', pop_indic)
-        logger.info('population: %s', pop_indic)
         previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, accepted_distances)
-        logger.debug('epsilons: %s', epsilons)
         parameters_accepted = []
         accepted_distances = []
 
