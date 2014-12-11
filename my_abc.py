@@ -10,6 +10,7 @@ import sampl_initi_condit
 import clustering
 import logging
 import matplotlib.pyplot as plt
+import math
 
 logging.basicConfig(filename='my_abc_scan.log', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -20,6 +21,7 @@ def central():
     number_particles = int(read_input.number_particles)
     number_to_sample = int(read_input.number_to_sample)
     init_cond_to_sample = int(read_input.initial_conditions_samples)
+    alpha = math.ceil(int(read_input.alpha)*number_particles)
     species_numb_to_fit = read_input.species_numb_to_fit_lst
     logger.debug('number of particles: %s', number_particles)
     logger.debug('number_to_sample: %s', number_to_sample)
@@ -79,7 +81,7 @@ def central():
     while epsilons[0] > epsilons_final[0] or epsilons[1] > epsilons_final[1] or epsilons[2] > epsilons_final[2]:
         finished = 'false'
         logger.info('population: %s', pop_indic)
-        previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, accepted_distances)
+        previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, accepted_distances, alpha)
         parameters_accepted = []
         accepted_distances = []
 
@@ -126,13 +128,13 @@ def central():
     return final_weights, final_particles, final_timecourse1, final_timecourse2
 
 
-def prepare_next_pop(parameters_accepted, current_weights_list, distances_matrix):
+def prepare_next_pop(parameters_accepted, current_weights_list, distances_matrix, alpha):
     logger.info('Preparing next population')
     logger.debug('distances matrix: %s', distances_matrix)
     distances_matrix.sort(key=operator.itemgetter(0, 1, 2))
-    epsilon_cl_current = distances_matrix[9][0]
-    epsilon_t_current = distances_matrix[9][1]
-    epsilon_vcl_current = distances_matrix[9][2]
+    epsilon_cl_current = distances_matrix[alpha][0]
+    epsilon_t_current = distances_matrix[alpha][1]
+    epsilon_vcl_current = distances_matrix[alpha][2]
     epsilons = [epsilon_cl_current, epsilon_t_current, epsilon_vcl_current]
     logger.debug('epsilons: %s', epsilons)
 

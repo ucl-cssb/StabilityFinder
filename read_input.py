@@ -18,12 +18,12 @@ epsilon_cl = epsilons_cl.split( )
 
 number_of_cluster = root.find('number_of_clusters').text
 number_of_clusters = number_of_cluster.split( )
-
 total_variances = root.find('total_variance').text
 total_variance = total_variances.split( )
-
 cluster_variances = root.find('cluster_variance').text
 cluster_variance = cluster_variances.split( )
+alpha = root.find('alpha').text
+
 
 time = root.find('times').text
 times = time.split( )

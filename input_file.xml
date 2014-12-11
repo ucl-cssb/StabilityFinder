@@ -10,6 +10,9 @@
 <total_variance> 0.001 0.4 </total_variance>
 <cluster_variance> 100 0.004 </cluster_variance>
 
+<alpha> 0.3 </alpha>
+
+
 <particles> 5 </particles>
 <number_to_sample> 10 </number_to_sample>
 <initial_conditions_samples> 100 </initial_conditions_samples>
