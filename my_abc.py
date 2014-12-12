@@ -87,15 +87,7 @@ def central():
 
         while finished == 'false':
             parameters_sampled, current_sampled_weights = sample_params(previous_parameters, previous_weights_list, number_to_sample)
-
-
-            for i in parameters_sampled:
-                logger.debug('parameters_sampled 1: %s', len(i))
-
             perturbed_particles, previous_weights_list = perturb_particles(parameters_sampled, current_sampled_weights, pop_indic)
-            for i in parameters_sampled:
-                logger.debug('parameters_sampled 2: %s', len(i))
-
             cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample)
             distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample)
             parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, perturbed_particles, epsilons)
@@ -216,8 +208,6 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
     #Here multiply the 'parameters' martix, to repeat each line 100 times, keeping the same order. this is so that the initial conditions and parameters matrices are equal.
     #There are 100 initial conditions per parameter set
     expanded_params_list = []
-    for i in parameters_sampled:
-        logger.debug('parameters_sampled: %s', len(i))
     logger.info('Expanding parameters list to match initial conditions')
     for i in parameters_sampled:
         for j in range(0, init_cond_to_sample):
@@ -324,17 +314,17 @@ def particle_weights(parameters_sampled, weights_list):
     return weights_list
 
 
-def perturb_particles(parameters_sampled,current_weights_list,pop_indic):
+def perturb_particles(parameters_sampled, current_weights_list, pop_indic):
     logger.info('Perturbing particles...')
     ##Make a new list which will be used so that you dont confuse them with the sampled parameters
     not_perturbed_particles = copy.deepcopy(parameters_sampled)
     #logger.debug('not_perturbed_particles matrix: %s', not_perturbed_particles)
 
-
     perturbed_particles = []
     for particle in not_perturbed_particles:
         part_params = []
-        for i in range(0, len(particle)):
+
+        for i in range(0, len(particle)-1):
             if i == 0:
                 part_params.append(1.0)
                 i += 1
@@ -343,7 +333,7 @@ def perturb_particles(parameters_sampled,current_weights_list,pop_indic):
                 maximum = max(param[i] for param in parameters_sampled)
                 scale = (maximum-minimum)/2
                             
-                if particle[i] + scale < float(read_input.lims[i][2]) and particle[i] -scale > float(read_input.lims[i][1]):
+                if particle[i] + scale < float(read_input.lims[i][2]) and particle[i] - scale > float(read_input.lims[i][1]):
                     delta_perturb = random.uniform(low=-scale, high=scale)
                     part_params.append(particle[i] + delta_perturb)
                     i += 1
@@ -351,7 +341,7 @@ def perturb_particles(parameters_sampled,current_weights_list,pop_indic):
                     delta_perturb = random.uniform(low=-scale, high= float(read_input.lims[i][2])-particle[i])
                     part_params.append(particle[i] + delta_perturb)
                     i += 1
-                elif particle[i] -scale < float(read_input.lims[i][1]):
+                elif particle[i] - scale < float(read_input.lims[i][1]):
                     delta_perturb = random.uniform(low=float(read_input.lims[i][1])-particle[i], high=scale)
                     part_params.append(particle[i] + delta_perturb)
                     i += 1
