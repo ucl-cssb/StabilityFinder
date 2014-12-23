@@ -89,7 +89,7 @@ def central():
             parameters_sampled, current_sampled_weights = sample_params(previous_parameters, previous_weights_list, number_to_sample)
             perturbed_particles, previous_weights_list = perturb_particles(parameters_sampled, current_sampled_weights, pop_indic)
             cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample)
-            distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample)
+            distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit)
             parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, perturbed_particles, epsilons)
             # Append the accepted ones to a matrix which will be built up until you reach the number of particles you want
             for i in parameters_sampled:
@@ -109,7 +109,7 @@ def central():
             if finished == 'true':
                 break
 
-        fig = plot_steady_states(cudasim_result, pop_indic, number_particles, init_cond_to_sample)
+        fig = plot_steady_states(cudasim_result, pop_indic, number_particles, init_cond_to_sample, species_numb_to_fit)
         current_weights_list = perturbed_particle_weights(parameters_accepted, previous_weights_list, previous_parameters)
         #numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Population'+str(pop_indic+1)+'.txt', parameters_accepted, delimiter=' ')
         #numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/data_Weights'+str(pop_indic+1)+'.txt', current_weights_list, delimiter=' ')
@@ -132,9 +132,12 @@ def prepare_next_pop(parameters_accepted, current_weights_list, distances_matrix
     logger.info('Preparing next population')
     logger.debug('distances matrix: %s', distances_matrix)
     distances_matrix.sort(key=operator.itemgetter(0, 1, 2))
-    epsilon_cl_current = distances_matrix[int(alpha)][0]
+    logger.debug('distances length preparing: %s', len(distances_matrix))
+    epsilon_cl_current =distances_matrix[int(alpha)][0]
     epsilon_t_current = distances_matrix[int(alpha)][1]
+    epsilon_t_current = round(epsilon_t_current, 4)
     epsilon_vcl_current = distances_matrix[int(alpha)][2]
+    epsilon_vcl_current = round(epsilon_vcl_current, 4)
     epsilons = [epsilon_cl_current, epsilon_t_current, epsilon_vcl_current]
     logger.debug('epsilons: %s', epsilons)
 
@@ -162,7 +165,7 @@ def sample_priors(number_to_sample):
 
 def sample_params(parameters_accepted, current_weights_list, number_to_sample):
     logger.info('sampling particles from previous population')
-
+    logger.debug('length of parameters accepted: %s', len(parameters_accepted))
 
     def choose_sample(current_weights_list):
         #Bernouli trials
@@ -193,8 +196,6 @@ def sample_params(parameters_accepted, current_weights_list, number_to_sample):
         weights_val_list.append(weight_val)
         param = parameters_accepted[index]
         parameters_list.append(param)
-    for i in parameters_list:
-        logger.debug('parameters list: %s', len(i))
     logger.debug('Number of particles sampled: %s', len(parameters_list))
     logger.debug('Number of particle weights: %s', len(weights_val_list))
     return parameters_list, weights_val_list
@@ -209,6 +210,10 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
     #There are 100 initial conditions per parameter set
     expanded_params_list = []
     logger.info('Expanding parameters list to match initial conditions')
+
+    logger.debug('Length of parameters list: %s', len(parameters_sampled))
+
+
     for i in parameters_sampled:
         for j in range(0, init_cond_to_sample):
             expanded_params_list.append(i)
@@ -248,16 +253,16 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample)
         #[#threads][#beta][#timepoints][#speciesNumber]
         set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0]):int(species_numb_to_fit[1]) + 1]
-        cluster_counter, clusters_means, total_variance, median_clust_var = clustering.distance(set_result)
+        set_ss = cudasim_result[range_start:range_end, 0, -1:-10, int(species_numb_to_fit[0]):int(species_numb_to_fit[1]) + 1]
+        cluster_counter, clusters_means, total_variance, median_clust_var = clustering.distance(set_result, set_ss)
         distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2])])
     logger.debug('Distances matrix: %s', distances_matrix)
     return distances_matrix
 
-
 def plot_steady_states(cudasim_result, pop_indic, number_to_sample, init_cond_to_sample, species_numb_to_fit):
     #[#threads][#beta][#timepoints][#speciesNumber]
 
-    fig, axs = plt.subplots(5, 2, figsize=(30, 20), facecolor='w', edgecolor='k')
+    fig, axs = plt.subplots(10, 10, figsize=(30, 20), facecolor='w', edgecolor='k')
     fig.subplots_adjust(hspace=.5, wspace=0.1)
     axs = axs.ravel()
 
@@ -324,11 +329,11 @@ def perturb_particles(parameters_sampled, current_weights_list, pop_indic):
     for particle in not_perturbed_particles:
         part_params = []
 
-        for i in range(0, len(particle)-1):
-            if i == 0:
+        for i in range(1, len(particle)):
+            if i == 1:
                 part_params.append(1.0)
                 i += 1
-            if i > 0:
+            if i > 1:
                 minimum = min(param[i] for param in parameters_sampled)
                 maximum = max(param[i] for param in parameters_sampled)
                 scale = (maximum-minimum)/2

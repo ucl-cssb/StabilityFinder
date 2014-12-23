@@ -2,19 +2,19 @@
 
 #Final accepted distance from desired values
 <epsilon_t> 200 1 </epsilon_t>
-<epsilon_vcl> 200 0.1 </epsilon_vcl>
-<eps_cl> 10 0.001 </eps_cl>
+<epsilon_vcl> 200 1 </epsilon_vcl>
+<eps_cl> 10 1 </eps_cl>
 
 #Desired behaviour
 <number_of_clusters> 10 2 </number_of_clusters>
-<total_variance> 0.001 0.4 </total_variance>
-<cluster_variance> 100 0.004 </cluster_variance>
+<total_variance> 0.001 1 </total_variance>
+<cluster_variance> 100 0.1 </cluster_variance>
 
-<alpha> 0.3 </alpha>
+<alpha> 0.9 </alpha>
 
 
-<particles> 5 </particles>
-<number_to_sample> 10 </number_to_sample>
+<particles> 100 </particles>
+<number_to_sample> 1000 </number_to_sample>
 <initial_conditions_samples> 100 </initial_conditions_samples>
 <species_numb_to_fit> 4 5 </species_numb_to_fit>
 <times>0 100</times>
