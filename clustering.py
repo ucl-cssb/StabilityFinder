@@ -1,5 +1,5 @@
 import numpy as np
-def distance(data, set_ss):
+def distance(data):
    
     clusters_means = {}
     clusters_data = {}
@@ -25,15 +25,8 @@ def distance(data, set_ss):
 
         var = 1/(np.var(data))
         return var
-
-    #def reached_ss(set_ss):
-    #    for i in set_ss:
-    #        print i
-    #    return i
-
-
-    #total_var = total_variance(data)
-    #j = reached_ss(set_ss)
+    
+    total_var = total_variance(data)
     #print '1/total_var received', total_var
 
     def cluster_variance(cluster):
