@@ -1,7 +1,7 @@
 import random
 from numpy import *
 
-def sample_init(number_species, number_to_sample):
+def sample_init(number_species, number_to_sample,init_cond_to_sample):
     init_codit_matrix = zeros([100, int(number_species)])
     init_cond_total_matrix = []
     #init_conds = []
