@@ -87,8 +87,7 @@ def central():
         pop_indic += 1
               
     while epsilons[0] > epsilons_final[0] or epsilons[1] > epsilons_final[1] or epsilons[2] > epsilons_final[2]:
-        #timecourseA2 = []
-        #timecourseB2 = []
+
         finished = 'false'
         logger.info('population: %s', pop_indic)
         previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, final_desired_values, accepted_distances)
@@ -136,27 +135,20 @@ def central():
             end = time.time()
             logger.debug('TIME: %s', end - start)
             break
-    return final_weights, final_particles, final_timecoursesA2, final_timecoursesB2
+    return final_weights, final_particles, final_timecourse1, final_timecourse2
 
 
-def prepare_next_pop(parameters_accepted, current_weights_list, final_desired_values, distances_matrix):
+def prepare_next_pop(parameters_accepted, current_weights_list, alpha, distances_matrix):
     logger.info('Preparing next population')
     logger.debug('distances matrix: %s', distances_matrix)
-    distances_matrix.sort(key = operator.itemgetter(0, 1, 2))
-    #sort_dist_cl = sorted(distances_matrix, key=itemgetter(0))
-    #logger.debug('distances matrix: %s', distances_matrix)
-    epsilon_cl_current = distances_matrix[9][0]
-    epsilon_t_current = distances_matrix[9][1]
-    epsilon_vcl_current = distances_matrix[9][2]
-
-    #alpha = [alpha_cl_current, alpha_t_current, alpha_vcl_current]
-    #epsilon_cl_current = abs(alpha_cl_current - final_desired_values[0])
-    #epsilon_t_current = abs(alpha_t_current - final_desired_values[1])
-    #epsilon_vcl_current = abs(alpha_vcl_current - final_desired_values[2])
-
+    distances_matrix.sort(key=operator.itemgetter(0, 1, 2))
+    epsilon_cl_current = distances_matrix[alpha][0]
+    epsilon_t_current = distances_matrix[alpha][1]
+    #epsilon_t_current = round(epsilon_t_current, 4)
+    epsilon_vcl_current = distances_matrix[alpha][2]
+    #epsilon_vcl_current = round(epsilon_vcl_current, 4)
     epsilons = [epsilon_cl_current, epsilon_t_current, epsilon_vcl_current]
-    logger.debug('alpha: %s', epsilons)
-
+    logger.debug('epsilons: %s', epsilons)
     return parameters_accepted, current_weights_list, epsilons
 
 
@@ -213,10 +205,8 @@ def sample_params(parameters_accepted, current_weights_list, number_to_sample):
         weights_val_list.append(weight_val)
         param = parameters_accepted[index]
         parameters_list.append(param)
-    len_list = len(parameters_list)
-    len_list_w = len(weights_val_list)
-    logger.debug('Number of particles sampled: %s', len_list)
-    logger.debug('Number of particle weights: %s', len_list_w)
+    logger.debug('Number of particles sampled: %s', len(parameters_list))
+    logger.debug('Number of particle weights: %s', len(weights_val_list))
     return parameters_list, weights_val_list
 
 
@@ -228,10 +218,7 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
     #There are 100 initial conditions per parameter set
     expanded_params_list = []
     logger.info('Expanding parameters list to match initial conditions')
-
     logger.debug('Length of parameters list: %s', len(parameters_sampled))
-
-
     for i in parameters_sampled:
         for j in range(0, init_cond_to_sample):
             expanded_params_list.append(i)
@@ -256,36 +243,24 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
     logger.info('Simulating...')
     modelInstance = Lsoda.Lsoda(times, cudaCode, dt=0.1)
     result = modelInstance.run(expanded_params_list, init_cond_list)
-    #timecourseA2 = result[:, 0, :, 4]
-    #timecourseB2 = result[:, 0, :, 5]
-    #cudasim_result = result[:, 0, :, 4]
-    cudasim_result = result[:, :, :, :]
-    #print 'ITS MEEEEE', cudasim_result
     #[#threads][#beta][#timepoints][#speciesNumber]
     logger.info('finished')
-    return cudasim_result
+    return result
 
 def measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit):
 
     logger.info('Distance module called')
     distances_matrix = []
-
     for i in range(0, int(number_to_sample)):
         range_start = i*int(init_cond_to_sample)
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample) - 1
-        #logger.debug('start: %s', range_start)
-        #logger.debug('end: %s', range_end)
         #[#threads][#beta][#timepoints][#speciesNumber]
         set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
-        #set_result = cudasim_result[range_start:range_end, 0, -1, 0:2]
-        #set_ss = cudasim_result[range_start:range_end, 0, -1:-10, int(species_numb_to_fit[0]):int(species_numb_to_fit[1]) + 1]
-        #logger.debug('set_result: %s', set_result)
+        #set_ss = cudasim_result[range_start:range_end, 0, -1:-10, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
         cluster_counter, clusters_means, total_variance, median_clust_var = clustering.distance(set_result)
         distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2])])
-    #logger.debug('Distances matrix: %s', distances_matrix)\
     logger.info('Distance finished')
     return distances_matrix
-
 
 def plot_steady_states(cudasim_result, pop_indic, number_to_sample, init_cond_to_sample, species_numb_to_fit):
     #[#threads][#beta][#timepoints][#speciesNumber]
@@ -327,7 +302,7 @@ def accept_reject_params(distances_matrix, parameters_sampled, epsilons):
     index_to_delete = set(index_to_delete)
     index_to_delete_l = list(index_to_delete)
     sorted_index_delete = sorted(index_to_delete_l)
-    logger.debug('index delete: %s', sorted_index_delete)
+    logger.debug('indexes to delete: %s', sorted_index_delete)
     if len(sorted_index_delete) > 0:
         for index in reversed(sorted_index_delete):
             del distances_matrix[index]
@@ -353,23 +328,20 @@ def perturb_particles(parameters_sampled,current_weights_list, pop_indic):
     logger.info('Perturbing particles...')
     ##Make a new list which will be used so that you dont confuse them with the sampled parameters
     not_perturbed_particles = copy.deepcopy(parameters_sampled)
-    #logger.debug('not_perturbed_particles matrix: %s', not_perturbed_particles)
-
-
     perturbed_particles = []
     for particle in not_perturbed_particles:
         part_params = []
-        i = 0
-        while i < len(particle):
-            if i == 0:
+
+        for i in range(1, len(particle)):
+            if i == 1:
                 part_params.append(1.0)
                 i += 1
-            if i > 0:
+            if i > 1:
                 minimum = min(param[i] for param in parameters_sampled)
                 maximum = max(param[i] for param in parameters_sampled)
                 scale = (maximum-minimum)/2
-                            
-                if particle[i] + scale < float(read_input.lims[i][2]) and particle[i] -scale > float(read_input.lims[i][1]):
+
+                if particle[i] + scale < float(read_input.lims[i][2]) and particle[i] - scale > float(read_input.lims[i][1]):
                     delta_perturb = random.uniform(low=-scale, high=scale)
                     part_params.append(particle[i] + delta_perturb)
                     i += 1
@@ -377,16 +349,14 @@ def perturb_particles(parameters_sampled,current_weights_list, pop_indic):
                     delta_perturb = random.uniform(low=-scale, high= float(read_input.lims[i][2])-particle[i])
                     part_params.append(particle[i] + delta_perturb)
                     i += 1
-                elif particle[i] -scale < float(read_input.lims[i][1]):
+                elif particle[i] - scale < float(read_input.lims[i][1]):
                     delta_perturb = random.uniform(low=float(read_input.lims[i][1])-particle[i], high=scale)
                     part_params.append(particle[i] + delta_perturb)
                     i += 1
-                                   
+
             if i == len(particle):
                 perturbed_particles.append(part_params)
-                break
     logger.info('Perturbation finished')
-    #logger.debug('perturbed_particles matrix: %s', perturbed_particles)
     return perturbed_particles, current_weights_list
 
 
@@ -404,21 +374,18 @@ def perturbed_particle_weights(parameters_accepted, prev_weights_list, previous_
     current_weights_list = []
     """ numerator """
     num_tmp = []
-    i = 1
-    while i < len(read_input.lims):
+    for i in range(1, len(read_input.lims)):
         numerator = 0
         minimum_pert = float(read_input.lims[i][1])
         maximum_pert = float(read_input.lims[i][2])
         numer = 1/(maximum_pert-minimum_pert)
         num_tmp.append(numer)
-        i += 1
     numerator = reduce(operator.mul, num_tmp, 1)
     """ denominator """
     for particle in range(len(parameters_accepted)):
         #Calculate the probability for each parameter of the particle
-        paramet = 1
         params_denom = []
-        while paramet < len(read_input.lims):
+        for paramet in range(1, len(read_input.lims)):
             denominator_tmp = []
             minimum_prev = min(param[paramet] for param in previous_parameters)
             maximum_prev = max(param[paramet] for param in previous_parameters)
@@ -426,9 +393,6 @@ def perturbed_particle_weights(parameters_accepted, prev_weights_list, previous_
             for prev_particle in range(len(previous_parameters)):
                 denominator_tmp.append(uniform_pdf(parameters_accepted[particle][paramet], previous_parameters[prev_particle][paramet]-delta, previous_parameters[prev_particle][paramet]+delta))
             params_denom.append(sum(denominator_tmp))
-            paramet += 1
-            if paramet == len(read_input.lims):
-                break
 
         #reduce calculates the cumulative sum from left to to right.
         #operator.mul multiplies
@@ -440,12 +404,9 @@ def perturbed_particle_weights(parameters_accepted, prev_weights_list, previous_
     n = sum(current_weights_list)
     for i in range(len(current_weights_list)):
         current_weights_list[i] = float(current_weights_list[i])/float(n)
-
     logger.debug('perturbed_particles weights matrix: %s', current_weights_list)
-
     return current_weights_list
 
-
-final_weights, final_particles, final_timecoursesA2, final_timecoursesB2 = central()
+final_weights, final_particles, final_timecourses1, final_timecourses2 = central()
 numpy.savetxt('Parameter_values_final.txt', final_particles, delimiter=' ')
 numpy.savetxt('Parameter_weights_final.txt', final_weights, delimiter=' ')
