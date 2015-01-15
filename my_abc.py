@@ -23,6 +23,7 @@ def central():
     number_to_sample = int(read_input.number_to_sample)
     init_cond_to_sample = int(read_input.initial_conditions_samples)
     alpha = math.ceil(float(read_input.alpha)*number_particles)
+    logger.debug('alpha: %s', alpha)
     species_numb_to_fit = read_input.species_numb_to_fit_lst
     logger.debug('number of particles: %s', number_particles)
     logger.debug('number_to_sample: %s', number_to_sample)
@@ -57,9 +58,6 @@ def central():
 
             cudasim_result = simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample)
             distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit)
-
-            #timecourseA2, timecourseB2 = simulate_dataset(parameters_sampled, number_to_sample)
-            #distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values)
             parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, parameters_sampled, epsilons)
             for i in parameters_sampled:
                 parameters_accepted.append(i)
@@ -77,7 +75,7 @@ def central():
                 logger.info('Not reached number of particles, sampling again')
                 logger.info('Total number of particles accepted: %s', len(parameters_accepted))
             if finished == 'true':
-                logger.info('accepted_distances: %s', accepted_distances)
+                logger.info('accepted_distances: %s', len(accepted_distances))
                 logger.info('param_acc length: %s', len(parameters_accepted))
                 break
         fig = plot_steady_states(cudasim_result, pop_indic, number_particles, init_cond_to_sample, species_numb_to_fit)
@@ -90,7 +88,7 @@ def central():
 
         finished = 'false'
         logger.info('population: %s', pop_indic)
-        previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, final_desired_values, accepted_distances)
+        previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, alpha, accepted_distances)
         logger.debug('epsilons: %s', epsilons)
         parameters_accepted = []
         accepted_distances = []
@@ -140,12 +138,12 @@ def central():
 
 def prepare_next_pop(parameters_accepted, current_weights_list, alpha, distances_matrix):
     logger.info('Preparing next population')
-    logger.debug('distances matrix: %s', distances_matrix)
+    logger.debug('length of distances matrix: %s', len(distances_matrix))
     distances_matrix.sort(key=operator.itemgetter(0, 1, 2))
-    epsilon_cl_current = distances_matrix[alpha][0]
-    epsilon_t_current = distances_matrix[alpha][1]
+    epsilon_cl_current = distances_matrix[int(alpha)][0]
+    epsilon_t_current = distances_matrix[int(alpha)][1]
     #epsilon_t_current = round(epsilon_t_current, 4)
-    epsilon_vcl_current = distances_matrix[alpha][2]
+    epsilon_vcl_current = distances_matrix[int(alpha)][2]
     #epsilon_vcl_current = round(epsilon_vcl_current, 4)
     epsilons = [epsilon_cl_current, epsilon_t_current, epsilon_vcl_current]
     logger.debug('epsilons: %s', epsilons)
@@ -332,11 +330,11 @@ def perturb_particles(parameters_sampled,current_weights_list, pop_indic):
     for particle in not_perturbed_particles:
         part_params = []
 
-        for i in range(1, len(particle)):
-            if i == 1:
+        for i in range(0, len(particle)):
+            if i == 0:
                 part_params.append(1.0)
-                i += 1
-            if i > 1:
+                #i += 1
+            if i > 0:
                 minimum = min(param[i] for param in parameters_sampled)
                 maximum = max(param[i] for param in parameters_sampled)
                 scale = (maximum-minimum)/2
