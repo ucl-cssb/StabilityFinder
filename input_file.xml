@@ -1,7 +1,7 @@
 <input>
 
 #Final accepted distance from desired values
-<epsilon_t> 200 1 </epsilon_t>
+<epsilon_t> 200 0.5 </epsilon_t>
 <epsilon_vcl> 200 1 </epsilon_vcl>
 <eps_cl> 10 1 </eps_cl>
 
@@ -22,16 +22,16 @@
 
 
 <parameter1> constant 1.0 </parameter1>
-<ge> uniform 5 7 </ge>
-<rep> uniform 5 10 </rep>
-<rep_r> uniform 0 2 </rep_r>
-<dim> uniform 7 10 </dim>
+<ge> uniform 1 10 </ge>
+<rep> uniform 1 10 </rep>
+<rep_r> uniform 1 10 </rep_r>
+<dim> uniform 1 10 </dim>
 <dim_r> uniform 0 5 </dim_r>
-<deg> uniform 2 5 </deg>
-<rep_dim> uniform 8 11 </rep_dim>
-<rep_dim_r> uniform 0.01 0.05 </rep_dim_r>
-<deg_sr> uniform 0.01 0.05 </deg_sr>
-<deg_dim> uniform 0 0.1 </deg_dim>
+<deg> uniform 1 10 </deg>
+<rep_dim> uniform 5 15 </rep_dim>
+<rep_dim_r> uniform 0.001 0.1 </rep_dim_r>
+<deg_sr> uniform 0.01 0.1 </deg_sr>
+<deg_dim> uniform 0 0.5 </deg_dim>
 
 
 <ic1>  0.0 </ic1>
