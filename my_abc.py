@@ -1,8 +1,6 @@
 import read_input
 import numpy
 from numpy import random
-import cudasim
-import cudasim.Lsoda as Lsoda
 import copy
 import time
 import operator
@@ -11,6 +9,13 @@ import clustering
 import logging
 import matplotlib.pyplot as plt
 import math
+import sys
+sys.path.append("/home/ucbtle1/cuda-sim-code")
+import cudasim
+import cudasim.Lsoda as Lsoda
+import cudasim.EulerMaruyama as EulerMaruyama
+import cudasim.Gillespie as Gillespie
+
 
 logging.basicConfig(filename='my_abc_scan.log', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
