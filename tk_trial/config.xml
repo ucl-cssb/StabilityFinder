@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hammerdb>
+  <rdbms>Oracle</rdbms>
+  <bm>TPC-C</bm>
+  <oracle>
+    <service>
+      <system_user>SYSTEM</system_user>
+      <system_password>PASSWORD</system_password>
+      <service_name>PROD</service_name>
+    </service>
+  </oracle>
+</hammerdb>
