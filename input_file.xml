@@ -11,8 +11,8 @@
 <cluster_variance> 10 10 </cluster_variance>
 
 <alpha> 0.1 </alpha>
-<particles>10</particles>
-<number_to_sample> 100 </number_to_sample>
+<particles>100</particles>
+<number_to_sample> 1000 </number_to_sample>
 <initial_conditions_samples> 100 </initial_conditions_samples>
 
 <times>0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100</times>
@@ -34,17 +34,17 @@
 <deg_dim> uniform 0 0.5 </deg_dim>
 
 
-<ic1>  0.0 </ic1>
-<ic2>  1.0 </ic2>
-<ic3>  0.0 </ic3>
-<ic4>  1.0 </ic4>
-<ic5>  0.0 </ic5>
-<ic6>  0.0 </ic6>
-<ic7>  0.0 </ic7>
-<ic8>  0.0 </ic8>
-<ic9>  0.0 </ic9>
-<ic10>  0.0 </ic10>
-<ic11>  0.0 </ic11>
-<ic12>  0.0 </ic12>
+<ic1>  constant 0.0 </ic1>
+<ic2>  constant 1.0 </ic2>
+<ic3>  constant 0.0 </ic3>
+<ic4>  constant 1.0 </ic4>
+<ic5>  uniform 0.0 10.0 </ic5>
+<ic6>  uniform 0.0 10.0 </ic6>
+<ic7>  constant 0.0 </ic7>
+<ic8>  constant 0.0 </ic8>
+<ic9>  constant 0.0 </ic9>
+<ic10>  constant 0.0 </ic10>
+<ic11>  constant 0.0 </ic11>
+<ic12>  constant 0.0 </ic12>
 
 </input>
