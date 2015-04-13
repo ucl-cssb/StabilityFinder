@@ -1,7 +1,8 @@
 *.pyc
-results_txt_files
+results_txt_files/*
 plot_population*
 Parameter_*_final.txt
 *.log
 nohup.out
 .idea/
+Various_models/*
