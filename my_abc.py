@@ -17,7 +17,7 @@ import cudasim.EulerMaruyama as EulerMaruyama
 import cudasim.Gillespie as Gillespie
 
 
-logging.basicConfig(filename='my_abc_scan.log', level=logging.DEBUG)
+logging.basicConfig(filename='my_abc_scan.log', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -226,7 +226,8 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
         for j in range(0, init_cond_to_sample):
             expanded_params_list.append(i)
 
-    init_cond_list = sampl_initi_condit.sample_init(number_species, number_to_sample, init_cond_to_sample)
+    init_cond_list = sampl_initi_condit.sample_init(number_to_sample, init_cond_to_sample)
+    logger.debug('initial conditions:%s', init_cond_list)
     logger.debug('Length of expanded parameters list: %s', len(expanded_params_list))
     logger.debug('Length of initial conditions list: %s', len(init_cond_list))
 
@@ -242,10 +243,11 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
 
     times = read_input.times
     #CUDA SIM BIT
-    cudaCode = 'sw_std_dim_deg_sym.cu'
+    cudaCode = 'model.cu'
     logger.info('Simulating...')
     modelInstance = Lsoda.Lsoda(times, cudaCode, dt=0.1)
     result = modelInstance.run(expanded_params_list, init_cond_list)
+    logger.debug('simulation result: %s', result)
     #[#threads][#beta][#timepoints][#speciesNumber]
     logger.info('finished')
     return result
@@ -259,28 +261,35 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample) - 1
         #[#threads][#beta][#timepoints][#speciesNumber]
         set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
+        logger.debug('set result: %s', set_result)
         #set_ss = cudasim_result[range_start:range_end, 0, -1:-10, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
         cluster_counter, clusters_means, total_variance, median_clust_var = clustering.distance(set_result)
+        logger.debug('cluster counter: %s', cluster_counter)
+        logger.debug('cluster counter desired: %s', final_desired_values[0])
+        logger.debug('cluster counter minus: %s', abs(cluster_counter - final_desired_values[0]))
         distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2])])
     logger.info('Distance finished')
+    logger.debug('Distance matrix: %s', distances_matrix)
     return distances_matrix
 
 def plot_steady_states(cudasim_result, pop_indic, number_to_sample, init_cond_to_sample, species_numb_to_fit):
     #[#threads][#beta][#timepoints][#speciesNumber]
     logger.info('plotting')
-    fig, axs = plt.subplots(10, 10, figsize=(30, 20), facecolor='w', edgecolor='k')
-    fig.subplots_adjust(hspace=.5, wspace=0.1)
-    axs = axs.ravel()
-
+    #fig, axs = plt.subplots(10, 10, figsize=(30, 20), facecolor='w', edgecolor='k')
+    #fig.subplots_adjust(hspace=.5, wspace=0.1)
+    #axs = axs.ravel()
+    p=1
     for i in range(0, int(number_to_sample)):
         range_start = i*int(init_cond_to_sample)
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample)
         set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
-        for j in set_result:
-            axs[i].scatter(j[0], j[1], color='blue')
-    plt.savefig('plot_population_'+str(pop_indic+1)+'.pdf', bbox_inches=0)
+        #numpy.savetxt('set_result'+str(i)+'.txt', set_result, delimiter=' ')
+        numpy.savetxt('results_txt_files/Population_'+str(pop_indic+1)+'/set_result'+str(i)+'.txt', set_result, delimiter=' ')
+    #    for j in set_result:
+    #        axs[i].scatter(j[0], j[1], color='blue')
+    #plt.savefig('plot_population_'+str(pop_indic+1)+'.pdf', bbox_inches=0)
     logger.info('plotting done')
-    return fig
+    return p
 
 
 def accept_reject_params(distances_matrix, parameters_sampled, epsilons):
@@ -338,7 +347,6 @@ def perturb_particles(parameters_sampled,current_weights_list, pop_indic):
         for i in range(0, len(particle)):
             if i == 0:
                 part_params.append(1.0)
-                #i += 1
             if i > 0:
                 minimum = min(param[i] for param in parameters_sampled)
                 maximum = max(param[i] for param in parameters_sampled)
