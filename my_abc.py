@@ -133,8 +133,8 @@ def central():
             fig = plot_steady_states(cudasim_result, pop_indic, number_particles, init_cond_to_sample, species_numb_to_fit)
             final_weights = current_weights_list[:]
             final_particles = parameters_accepted[:][:]
-            final_timecourse1 = cudasim_result[:, 0, :, int(species_numb_to_fit[0])]
-            final_timecourse2 = cudasim_result[:, 0, :, int(species_numb_to_fit[1])]
+            final_timecourse1 = cudasim_result[:, 0, :, int(species_numb_to_fit[0])-1]
+            final_timecourse2 = cudasim_result[:, 0, :, int(species_numb_to_fit[1])-1]
             end = time.time()
             logger.debug('TIME: %s', end - start)
             break

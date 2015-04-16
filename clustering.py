@@ -5,7 +5,7 @@ def distance(data):
     clusters_data = {}
     clusters_variance = {}
     cluster_counter = 0
-    delta = 0.01
+    delta = 0.0001
     line_counter = 0
 
     """
