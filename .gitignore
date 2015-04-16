@@ -7,3 +7,7 @@ nohup.out
 Various_models/*
 .*DS_Store
 *~
+.R*
+._*
+*.png
+*.pdf
