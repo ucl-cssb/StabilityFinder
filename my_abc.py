@@ -17,7 +17,7 @@ import cudasim.EulerMaruyama as EulerMaruyama
 import cudasim.Gillespie as Gillespie
 
 
-logging.basicConfig(filename='my_abc_scan.log', level=logging.INFO)
+logging.basicConfig(filename='my_abc_scan.log', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -227,7 +227,7 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
             expanded_params_list.append(i)
 
     init_cond_list = sampl_initi_condit.sample_init(number_to_sample, init_cond_to_sample)
-    logger.debug('initial conditions:%s', init_cond_list)
+    #logger.debug('initial conditions:%s', init_cond_list)
     logger.debug('Length of expanded parameters list: %s', len(expanded_params_list))
     logger.debug('Length of initial conditions list: %s', len(init_cond_list))
 
