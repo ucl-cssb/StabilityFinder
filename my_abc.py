@@ -7,6 +7,7 @@ import operator
 import sampl_initi_condit
 import clustering
 import logging
+import steady_state_check
 import matplotlib.pyplot as plt
 import math
 import sys
@@ -247,7 +248,7 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
     logger.info('Simulating...')
     modelInstance = Lsoda.Lsoda(times, cudaCode, dt=0.1)
     result = modelInstance.run(expanded_params_list, init_cond_list)
-    logger.debug('simulation result: %s', result)
+    #logger.debug('simulation result: %s', result)
     #[#threads][#beta][#timepoints][#speciesNumber]
     logger.info('finished')
     return result
@@ -261,20 +262,56 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample) - 1
         #[#threads][#beta][#timepoints][#speciesNumber]
         set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
-        logger.debug('set result: %s', set_result)
-        #set_ss = cudasim_result[range_start:range_end, 0, -1:-10, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
+        ss_res_set = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
+        std_devs = steady_state_check.ss_check(ss_res_set)
         cluster_counter, clusters_means, total_variance, median_clust_var = clustering.distance(set_result)
-        logger.debug('cluster counter: %s', cluster_counter)
-        logger.debug('cluster counter desired: %s', final_desired_values[0])
-        logger.debug('cluster counter minus: %s', abs(cluster_counter - final_desired_values[0]))
-        distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2])])
+        #logger.debug('cluster counter: %s', cluster_counter)
+        distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2]), std_devs[0], std_devs[1]])
+
     logger.info('Distance finished')
     logger.debug('Distance matrix: %s', distances_matrix)
     return distances_matrix
 
+
+def accept_reject_params(distances_matrix, parameters_sampled, epsilons):
+    logger.info('Accepting or rejecting particles')
+    #Reject the priors>e.
+    index_to_delete = []
+    #new_list = sorted(distances_matrix, key=itemgetter(0))
+    #logger.debug('distances matrix: %s', distances_matrix)
+    for index, item in enumerate(distances_matrix):
+        #epsilon_cl_current is the distance of current alpha to desired behaviour!
+        #item!=item is a check in case the value is nan
+        if item[0] > epsilons[0] or item[0] != item[0]:
+            logger.debug('cluster counter failed')
+            index_to_delete.append(index)
+
+        if item[1] > epsilons[1] or item[1] != item[1]:
+            index_to_delete.append(index)
+            logger.debug('total variance failed')
+
+        if item[2] > epsilons[2] or item[2] != item[2]:
+            index_to_delete.append(index)
+            logger.debug('cluster variance failed')
+
+        if item[3] > 0.000001 or item[4] > 0.000001:
+            logger.debug('steady state check failed')
+            index_to_delete.append(index)
+
+    #get the unique values by converting the list to a set
+    index_to_delete = set(index_to_delete)
+    index_to_delete_l = list(index_to_delete)
+    sorted_index_delete = sorted(index_to_delete_l)
+    logger.debug('indexes to delete: %s', sorted_index_delete)
+    if len(sorted_index_delete) > 0:
+        for index in reversed(sorted_index_delete):
+            del distances_matrix[index]
+            del parameters_sampled[index]
+    return parameters_sampled, distances_matrix
+
 def plot_steady_states(cudasim_result, pop_indic, number_to_sample, init_cond_to_sample, species_numb_to_fit):
     #[#threads][#beta][#timepoints][#speciesNumber]
-    logger.info('plotting')
+    logger.info('saving result to file')
     #fig, axs = plt.subplots(10, 10, figsize=(30, 20), facecolor='w', edgecolor='k')
     #fig.subplots_adjust(hspace=.5, wspace=0.1)
     #axs = axs.ravel()
@@ -288,38 +325,8 @@ def plot_steady_states(cudasim_result, pop_indic, number_to_sample, init_cond_to
     #    for j in set_result:
     #        axs[i].scatter(j[0], j[1], color='blue')
     #plt.savefig('plot_population_'+str(pop_indic+1)+'.pdf', bbox_inches=0)
-    logger.info('plotting done')
+    logger.info('saving done')
     return p
-
-
-def accept_reject_params(distances_matrix, parameters_sampled, epsilons):
-    logger.info('Accepting or rejecting particles')
-    #Reject the priors>e.
-    index_to_delete = []
-    #new_list = sorted(distances_matrix, key=itemgetter(0))
-    #logger.debug('distances matrix: %s', distances_matrix)
-    for index, item in enumerate(distances_matrix):
-        #epsilon_cl_current is the distance of current alpha to desired behaviour!
-        #item!=item is a check in case the value is nan
-        if item[0] > epsilons[0] or item[0] != item[0]:
-            index_to_delete.append(index)
-
-        if item[1] > epsilons[1] or item[1] != item[1]:
-            index_to_delete.append(index)
-
-        if item[2] > epsilons[2] or item[2] != item[2]:
-            index_to_delete.append(index)
-
-    #get the unique values by converting the list to a set
-    index_to_delete = set(index_to_delete)
-    index_to_delete_l = list(index_to_delete)
-    sorted_index_delete = sorted(index_to_delete_l)
-    logger.debug('indexes to delete: %s', sorted_index_delete)
-    if len(sorted_index_delete) > 0:
-        for index in reversed(sorted_index_delete):
-            del distances_matrix[index]
-            del parameters_sampled[index]
-    return parameters_sampled, distances_matrix
 
 
 def particle_weights(parameters_sampled, weights_list):
