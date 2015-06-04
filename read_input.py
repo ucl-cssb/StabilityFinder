@@ -14,11 +14,11 @@ for data in root:
     elif data.tag == "eps_cl":
         epsilon_cl = data.text.split()
     elif data.tag == "number_of_clusters":
-        number_of_clusters = data.text
+        number_of_clusters = data.text.split()
     elif data.tag == "total_variance":
-        total_variance = data.text
+        total_variance = data.text.split()
     elif data.tag == "cluster_variance":
-        cluster_variance = data.text
+        cluster_variance = data.text.split()
     elif data.tag == "particles":
         number_particles = data.text
     elif data.tag == "number_to_sample":
