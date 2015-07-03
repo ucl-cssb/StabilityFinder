@@ -19,11 +19,11 @@ Running a new model
    
 -   Uncomment the parser and change the name of the xmlModel to the name of your SBML model:
 
-import cudasim.SBMLParser as Parser\
-Location of SBML model file\
-xmlModel = '___YOUR MODEL___.xml'\
-name = 'model'\
-create CUDA code from SBML model\
+import cudasim.SBMLParser as Parser\\
+Location of SBML model file\\
+xmlModel = '___YOUR MODEL___.xml'\\
+name = 'model'\\
+create CUDA code from SBML model\\
 Parser.importSBMLCUDA([xmlModel], ['ODE'], ModelName=[name])\
  
 -   Once you have ran this once (and the model.cu file has been created) you can comment this section off again
