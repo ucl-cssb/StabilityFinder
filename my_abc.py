@@ -237,7 +237,7 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
     #import cudasim.SBMLParser as Parser
     #Location of SBML model file
     #xmlModel = 'sw_std_dim_deg_sym_sbml.xml'
-    #name = 'sw_std_dim_deg_sym'
+    #name = 'model'
     # create CUDA code from SBML model
     #Parser.importSBMLCUDA([xmlModel], ['ODE'], ModelName=[name])
     #########################################################

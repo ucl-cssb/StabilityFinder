@@ -2,7 +2,7 @@
 
     <epsilon_t> 200 0.5 </epsilon_t>
     <epsilon_vcl> 200 1 </epsilon_vcl>
-    <eps_cl> 10 1 </eps_cl>
+    <eps_cl> 10 0.1 </eps_cl>
 
     #Desired behaviour
     <number_of_clusters> 10 2 </number_of_clusters>

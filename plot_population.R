@@ -28,12 +28,12 @@ p3 <- ggplot(p_values_final, aes(rep_r, weight=weights))  + geom_density(fill="g
 p4 <- ggplot(p_values_final, aes(dim, weight=weights))  + geom_density(fill="grey") + xlim(1,10) 
 p5 <- ggplot(p_values_final, aes(dim_r, weight=weights) ) + geom_density(fill="grey") + xlim(0,5) 
 p6 <- ggplot(p_values_final, aes(deg, weight=weights) ) + geom_density(fill="grey") + xlim(1,10) 
-p7 <- ggplot(p_values_final, aes(rep_dim, weight=weights))  + geom_density(fill="grey") + xlim(5,15) 
-p8 <- ggplot(p_values_final, aes(rep_dim_r, weight=weights) ) + geom_density(fill="grey") + xlim(0.001,0.1) 
-p9 <- ggplot(p_values_final, aes(deg_sr, weight=weights) ) + geom_density(fill="grey") + xlim(0.01,0.1) 
+#p7 <- ggplot(p_values_final, aes(rep_dim, weight=weights))  + geom_density(fill="grey") + xlim(5,15) 
+#p8 <- ggplot(p_values_final, aes(rep_dim_r, weight=weights) ) + geom_density(fill="grey") + xlim(0.001,0.1) 
+#p9 <- ggplot(p_values_final, aes(deg_sr, weight=weights) ) + geom_density(fill="grey") + xlim(0.01,0.1) 
 p10 <- ggplot(p_values_final, aes(deg_dim, weight=weights) ) + geom_density(fill="grey") + xlim(0,0.5) 
-grid.arrange(p1, p2, p3, p4, p5,p6,p7,p8,p9,p10,ncol=2) #arranges plots within grid
-g <- arrangeGrob(p1, p2, p3, p4, p5,p6,p7,p8,p9,p10, ncol=2,main=textGrob('Parameter value densities of last population of the toggle switch', vjust =1, gp = gpar(fontsize=14, fontface="bold", fontsize=14))) #generates g
+grid.arrange(p1, p2, p3, p4, p5,p6,p10,ncol=2) #arranges plots within grid
+g <- arrangeGrob(p1, p2, p3, p4, p5,p6,p10, ncol=2,main=textGrob('Parameter value densities of last population of the toggle switch', vjust =1, gp = gpar(fontsize=14, fontface="bold", fontsize=14))) #generates g
 ggsave(file="param_densities_last_pop.pdf", g, scale=2)
 #---------------------------------------------------------------------------------------------------
 plot_posterior_distr <- function(numb_params, param_names, limits, file_name,plot_title){
@@ -74,30 +74,26 @@ plot_posterior_distr <- function(numb_params, param_names, limits, file_name,plo
                 axis.title.x=element_blank(),
                 axis.title.y=element_blank(),
                 legend.position="none",
-                panel.background=element_blank(),
-                panel.border=element_blank(),
+                #panel.background=element_blank(),
+                #panel.border=element_blank(),
                 panel.grid.minor=element_blank(),
                 plot.background=element_blank(),
                 plot.margin=unit(c(0,0,-0.5,0), "lines"))
       }
     } 
   g <- do.call("arrangeGrob", c(pltList, list(ncol=ncol(p_values_final)-1,main=textGrob(plot_title, vjust=0.5, gp=gpar(fontsize=18, fontface="bold", fontsize=18)))))
-  ggsave(file=paste(file_name,".png",sep=''), g,width=9, height=9, dpi=300)
+  ggsave(file=paste(file_name,".pdf",sep=''), g,width=9, height=9, dpi=300)
 }
 
-#param_names <- c("ge", "rep","rep_r","dim","dim_r","deg","rep_dim","rep_dim_r","deg_sr", "deg_dim","weights")
-#limits <- cbind(c(1,10),c(1,10),c(1,10),c(1,10),c(0,5),c(1,10),c(5,15),c(0.001,0.1),c(0.01,0.1),c(0,0.5) )
-#file_name <- "Toggle_switch_posterior"
-#plot_title <- "Toggle switch posterior distribution"
+
 p_values_final = read.table("Parameter_values_final.txt")
 p_weights_final = read.table("Parameter_weights_final.txt")
 p_values_final <- subset(p_values_final, select = -p_values_final[,1] )
 p_values_final$param_weights <- unlist(p_weights_final)
 colnames(p_values_final) <- c("a1", "beta","a2","gama","weights")
-
 param_names <- c("a1", "beta","a2","gama","weights")
 limits <- cbind(c(0,10),c(0,10),c(0,10),c(0,10) )
-plot_posterior_distr(4, param_names, limits, "Gardner_posterior", "Gardner switch posterior distribution")
+plot_posterior_distr(4, param_names, limits, "switch_posterior", "Gardner switch posterior distribution")
 
 
 
