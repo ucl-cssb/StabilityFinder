@@ -16,18 +16,9 @@ Running a new model
 --------------------
 -   Add the SBML of you r model to the scanning_ABC_SMC directory
 -   In my_abc.py, function *simulate_dataset*: 
-
-    """    Simulate dataset """
-#import cudasim.SBMLParser as Parser
-#Location of SBML model file
-#xmlModel = 'sw_std_dim_deg_sym_sbml.xml'
-#name = 'sw_std_dim_deg_sym'
-# create CUDA code from SBML model
-#Parser.importSBMLCUDA([xmlModel], ['ODE'], ModelName=[name])
-    
+   
 -   Uncomment the parser and change the name of the xmlModel to the name of your SBML model:
 
-"""    Simulate dataset """
 import cudasim.SBMLParser as Parser
 Location of SBML model file
 xmlModel = '___YOUR MODEL___.xml'
