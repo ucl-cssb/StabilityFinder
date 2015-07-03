@@ -18,26 +18,22 @@ Running a new model
 -   In my_abc.py, function *simulate_dataset*: 
 
     """    Simulate dataset """
-    ###############	Create cuda code of model	###########
-    #import cudasim.SBMLParser as Parser
-    #Location of SBML model file
-    #xmlModel = 'sw_std_dim_deg_sym_sbml.xml'
-    #name = 'sw_std_dim_deg_sym'
-    # create CUDA code from SBML model
-    #Parser.importSBMLCUDA([xmlModel], ['ODE'], ModelName=[name])
-    #########################################################
+#import cudasim.SBMLParser as Parser
+#Location of SBML model file
+#xmlModel = 'sw_std_dim_deg_sym_sbml.xml'
+#name = 'sw_std_dim_deg_sym'
+# create CUDA code from SBML model
+#Parser.importSBMLCUDA([xmlModel], ['ODE'], ModelName=[name])
     
 -   Uncomment the parser and change the name of the xmlModel to the name of your SBML model:
 
-    """    Simulate dataset """
-    ###############	Create cuda code of model	###########
-    import cudasim.SBMLParser as Parser
-    #Location of SBML model file
-    xmlModel = '___YOUR MODEL___.xml'
-    name = 'model'
-    # create CUDA code from SBML model
-    Parser.importSBMLCUDA([xmlModel], ['ODE'], ModelName=[name])
-    #########################################################
+"""    Simulate dataset """
+import cudasim.SBMLParser as Parser
+Location of SBML model file
+xmlModel = '___YOUR MODEL___.xml'
+name = 'model'
+create CUDA code from SBML model
+Parser.importSBMLCUDA([xmlModel], ['ODE'], ModelName=[name])
  
 -   Once you have ran this once (and the model.cu file has been created) you can comment this section off again
  
@@ -66,11 +62,3 @@ input file:
 -   In run.sh file change to your own parameters. Keep the following line unchanged: 
     python read_input.py; python my_abc.py
     
-
-#*This will be Italic*
-#**This will be Bold**
-#- This will be a list item
-#- This will be a list item
-#    Add a indent and this will end up as code
-    
-   
