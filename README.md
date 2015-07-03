@@ -9,7 +9,7 @@ To run the Gardner switch in /examples:
 -   Run this file
 -   To check if the results are all bistable: in plot_population.R, set working directory to the last completed population in results_txt_files/Population_?. Run plot_stabilityChecker_particles funtion.
 -   To look at posterior: in plot_population.R, set working directory to the scanning_ABC_SMC directory. Run plot_posterior_distr function. param_names and colnames modify them to the names of your parameters and limits to your prior values.
-     plot_posterior_distr(4, param_names, limits, "switch_posterior_b", "Gardner switch posterior distribution")  
+     plot_posterior_distr(4, param_names, limits, "switch_posterior_b", "Gardner switch posterior distribution")    
      plot_posterior_distr(**number of parameters**, param_names, limits, **"file name"**, **"figure title"**)  
 
 Running a new model
@@ -19,17 +19,17 @@ Running a new model
    
 -   Uncomment the parser and change the name of the xmlModel to the name of your SBML model:
 
-import cudasim.SBMLParser as Parser\\
-Location of SBML model file\\
-xmlModel = '___YOUR MODEL___.xml'\\
-name = 'model'\\
-create CUDA code from SBML model\\
-Parser.importSBMLCUDA([xmlModel], ['ODE'], ModelName=[name])\
+import cudasim.SBMLParser as Parser  
+Location of SBML model file  
+xmlModel = '___YOUR MODEL___.xml'  
+name = 'model'  
+create CUDA code from SBML model  
+Parser.importSBMLCUDA([xmlModel], ['ODE'], ModelName=[name])  
  
 -   Once you have ran this once (and the model.cu file has been created) you can comment this section off again
  
 -   In input_file.xml modeify the inputs to what you want. 
-input file:\
+input file:  
 
 *epsilon_t* final distance accepted from desired total variance in order to finish  
 *epsilon_vcl* final distance accepted from desired cluster variance in order to finish  
