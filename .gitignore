@@ -1,5 +1,4 @@
 *.pyc
-results_txt_files/*
 Parameter_*_final.txt
 *.log
 nohup.out
