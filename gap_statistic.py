@@ -81,19 +81,17 @@ if __name__ == "__main__":
         X = np.array(X)[:N]
         return X
 
-    X = init_board_gauss(200, 4)
+    X = init_board_gauss(200, 3)
     #ks = which k were trialed
     ks, logWks, logWkbs, sk = gap_statistic(X)
     #gap = logWkbs - logWks
     gaps = []
     for i in range(len(ks)):
         gaps.append(logWkbs[i]-logWks[i])
-    g = []
-    for i in range(len(gaps)-1):
-        g.append(gaps[i]-(gaps[i+1]-sk[i+1]))
     #Find the smallest k such that Gap(k) > Gap(k+1) -  std_{k+1}
     cluster_counter = 1
-    for i in range(len(g)):
+    for i in range(len(gaps)):
+        print 'cluster', cluster_counter
         cluster_counter += 1
         if gaps[i] >= (gaps[i+1]-sk[i+1]):
         #if i > 0:
