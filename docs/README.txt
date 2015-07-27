@@ -48,4 +48,8 @@ In run.sh file change to your own parameters. Keep the following line unchanged:
 **************** To Do ********************************************************
 Set up deterministic or stochastic clustering form input file
 set up whether you want a cuda file or an smbl file from input file
+remove logging from clustering
+set up automatic plotting of results
+change my personal variables from my_abc.py file
+finish documentation
 ********************************************************************************
