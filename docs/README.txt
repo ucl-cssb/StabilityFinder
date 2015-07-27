@@ -1,6 +1,6 @@
 Installation:
-pip install git+git://github.com/mirelio/StabilityChecker
 
+python setup.py install -local
 
 Example
 

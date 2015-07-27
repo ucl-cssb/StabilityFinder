@@ -1,0 +1,153 @@
+\documentclass[a4paper]{report}
+\title{StabilityChecker}
+\author{Miriam Leon, Chris Barnes}
+\date{\today}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+\usepackage{verbatim}
+\usepackage{moreverb}
+\usepackage{natbib}
+\usepackage{amsmath}
+\advance\textwidth 2cm
+\advance\textheight 3cm
+\advance\oddsidemargin -1.5cm
+\advance\evensidemargin -1.5cm
+\advance\topmargin -1cm
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\chapter{Introduction}
+\chapter{Installation}
+	StabilityChecker has been developed to work on a Linux operating system, with GPU support.
+	
+The following dependencies are essential for the successful implementation of the package:
+\begin{itemize}
+	\item numpy
+	\item logging
+	\item cuda-sim
+	\item libsbml
+\end{itemize}
+
+
+\begin{verbatim}
+$ cd StabilityChecker
+$ python setup.py install
+\end{verbatim}
+
+\section{Linux}
+On linux this will copy the module \verb$stabilitychecker$ into the \verb$lib/pythonXX/site-packages$ directory corresponding to the python version that was used to invoke the installation.
+
+The path then should be added  by issuing
+\begin{verbatim}
+$ export PATH=<dir>:$PATH 
+\end{verbatim}
+in the shell \verb$run.sh$ script
+An \verb$exe=<dir>$ variable should also be added to the \verb$run.sh$ script pointing the script to the right package installation.
+\chapter{Using the package}
+\label{Using the package}
+
+\section{Conversion of SBML models to CUDA code}
+When \verb$run-abc-sysbio$ is run, model(s) written in SBML format are used to generate an appropriate code module representing the model, via a call to \verb$abcsysbio_parser.ParseandWrite$. The format of the code written depends on the integration type, which also informs the program which solver to use to simulate the model. (See Section \ref{extending}.)
+
+In an SBML model, values can be assigned to compartment sizes, to parameters and to species. When the Python module representing the model is written, the model is inspected to determine how values should be assigned during the course of the simulation. Compartments typically have a constant size and are considered as an additional parameter to the model, albeit one that the user may not want to infer. Some species may be outside of the scope of the reactions in the model, having either a constant value or a value assigned by an assignment rule. 
+
+Conversely, SBML has the capacity for rate rules to be used to assign values to species, parameters or compartment sizes. Rate rules are time-dependent rules used to assign values to variables. Because our solvers typically assign values to species over time to compute a trajectory, species, parameters and compartment sizes with rate rules are treated as `species' in a Python module representing the SBML model.
+
+\section{The user input file}
+Not all the information required for the algorithms is intrinsic to the model, therefore a .xml file that contains the additional information (such as initial conditions and parameter values) must be supplied to the script. This file,  the ``user input file", must be written in a specific format. Examples are included in the ``Examples" folder which is supplied along with the package; details of the input file are given here.
+
+\subsection{Required arguments}
+\begin{description}
+	\item[modelnumber] Number of the model for which details are described in this input file
+	\item[epsilon] This allows for the specification of the tolerance schedules. Often only one epsilon schedule is required but in more complex design problems or with inferences using summary statistics multiple epsilon schedules may be desired. Within the \verb$epsilon$ tags each vector of schedules can be specified via a whitespace delimited list of values between two tags eg \verb$<e1> </e1>$. Note that the parser ignores the name of the tag and so will always read them in order. If multiple schedules are provided then the user must specify a custom distance function (see Chapter \ref{extending}).
+	\item[autoepsilon] This is an experimental feature used instead of the {\bf epsilon} option where the epsilon schedule is automated. The vector of final epsilons (whitespace separated) can be specified within \verb$<finalepsilon> </finalepsilon>$ tags. The \verb$<alpha>$ tag specifies the quantile of the previous population distance distribution to choose as the next epsilon. The optimal value of this parameter will depend on the models and data.
+	\item[particles] Number of particles to accept
+	\item[beta] Number of times to simulate each sampled parameter set. For deterministic systems beta is set to 1. For analysis of stochastic systems beta can be chosen larger than 1.
+	\item[dt] The internal time step for the solvers.
+
+	\item[data] This section is divided into \verb$<times>$ and \verb$<variables>$. Both describe the experimental data for which the parameters or models respectively have to be analyzed. 
+	\begin{description}
+		\item[times]The time points are given within \verb$<times>$ tags as a whitespace delimited list. 
+		\item[variables]The species concentrations (in the case of an ODE or SDE simulation) or molecule numbers (in the case of a Gillespie simulation) are also given as whitespace delimited lists and denoted as \verb$<v1>$, \verb$<v2>$ .. \verb$<vN>$ for N different species. Note that the names of the tags is ignored and the parser always reads the species in order. Missing data can be specified provided that the first entry in present. Missing data is denoted by 'NA'.
+	\end{description}
+
+	\item[models] Each model is contained within tags \verb$<modeli>$ ({\it i} = 1, \dots, $M$, where $M$ is the total number of models to be investigated.) 
+	\begin{description}
+		\item[name] The name of the model which will be the name of the code written (with suitable extension .py, .cpp, .cu) to represent the model in a format that is interpretable by the solvers.  The name of the code model file if option \verb$--localcode$ is given.
+		\item[source] The name of the .xml file containing an SBML representation of the model. Can be left blank if option \verb$--localcode$ is given.
+		\item[type] The simulation type. One of \verb$ODE$, \verb$SDE$ or \verb$Gillespie$.
+		
+		\item[fit] Denotes the correspondence between the species defined in the SBML model and the experimental data. If this keyword is not given, or if \textbf{fit} is \verb$None$, all the species in the model are fitted to the data in the order that they are listed in the model. Otherwise, a comma-delimited list of fitting instructions with the same length as the dimensions of the data can be supplied. Simple arithmetic operations can be performed on the species from the SBML model. To denote the \verb$N$th species in the SBML model, use \verb$speciesN$. For example, to fit the sum of the first two species in the model, write \textbf{fit}: \verb$species1+species2$.
+		
+		\item[parameters, initial] Prior specifications on parameters and initial conditions. Note that the tag names for each parameter and species initial condition are ignored and are always read in the order specified. The prior is specified within the tags via a whitespace delimited list:
+		\begin{itemize}
+			\item constant $x$: constant parameter with value $x$
+			\item normal  $a$ $b$: lognormal distribution with location $a$ and var $b$ 
+			\item uniform  $a$  $b$: uniform distribution on the interval $[a, b]$
+			\item lognormal  $a$ $b$: lognormal distribution with location $a$ and var $b$ 
+		\end{itemize}
+	\end{description}
+\end{description}
+
+\subsection{Output}
+The outputs from running the ABC SMC algorithm are saved in a folder specified via the \verb$-of --outfolder$ option.
+\begin{itemize}
+	\item \verb$_data.png$, a scatter plot of your input data.
+	\item \verb$rates.txt$ containing population number, number of sampled particles, acceptance rate and time to complete in seconds
+	\item \verb$ModelDistribution_1.png$ and \verb$ModelDistribution.txt$ Histograms of the posterior distribution of accepted models after each population. Above each histogram the population number, epsilon, and acceptance rate for that population are displayed.
+	\item One text file per population, \verb$distance_PopulationN.txt$, listing the distances of the accepted particles together with the model number of the accepted model.
+	\item One text file per population, \verb$traj_PopulationN.txt$, the trajectories of the accepted particles. Each line contains:\\
+	 accepted particle number, replicate number (==0 if beta=1), model id, fitted species id, X(t=1), X(t=2) ...... 
+
+\item One sub-folder per model. These sub-folders, suffixed with the model name, contain sub-folders for each population, \verb$population_N$. Each contains:
+\begin{itemize}
+\item \verb$data_PopulationN.txt$, the accepted parameter sets
+\item \verb$data_WeightsN.txt$, the accepted parameter weights
+\item \verb$ScatterPlotPopulationN.png$, scatter plots of all accepted parameters. (See Figure \ref{AcceptedSIR})
+\item \verb$TimeseriesPopulationN.png$, simulations of the model using ten accepted parameter sets, to compare with the data. Refer to Figure \ref{TimeseriesSIR}.
+\item \verb$weightedHistograms_PopulationN.png$, histograms showing accepted parameter distributions.
+\end{itemize}
+\item \verb$copy$ contains in binary data form the information required to restart the ABC SMC algorithm using the last population. These files are not human-readable but are read into Python if the algorithm is being run restarting from a previous population. See Example 2.
+\end{itemize}
+
+\subsection{Editing the input file}
+To perform ABC SMC, some additional information does need to be added to the input file.
+\begin{description}
+\item[epsilons] A whitespace delimited list of floats, these are the distances below which a parameter set is accepted by the algorithm.
+\item[particles] Integer, the size of each population. 
+\item[dt] Float, the internal timestep. For a stiff model, a small \textbf{dt} is required for a successful simulation. However, the smaller the value of \textbf{dt}, the longer the simulation will take. The SIR models are not particularly stiff so \textbf{dt} can be set to 1.
+\end{description}
+Some model-specific information must be completed for each of the models.
+\begin{description}
+\item[name] The name of the python file that will represent the model. Defaults to \tt model1\rm, \tt model2\rm, ... ,\tt modelN\rm.  These have been renamed in the input file we are using.
+\item[source] The name of the .xml file containing the SBML model. The source file(s) must be in the same working directory as the scripts and the input file.
+\item[type] The integration type used to simulate the model. Defaults to \verb$ODE$. Other integration types are \verb$SDE$ (see Example 2) or \verb$Gillespie$ (see Example 3).
+\item[fit] A string, defaults to \verb$None$. If \textbf{fit} is not \verb$None$, it must take the form of a comma-delimited list of fitting instructions describing how to fit the species in the SBML model (denoted \verb$species1, species2, ... , speciesN$) to the variables given in the \textbf{data}. Model 2 in this example describes the trajectories of four species, including the latent population \emph{L}. However, our data only describes three variables.  We give the fitting instruction
+\begin{verbatim}
+fit: species1, species3, species4
+\end{verbatim}
+to denote that the first species in Model 2 describes variable 1 in the data, the third species in Model 2 describes variable 2 and the fourth species in Model 2 describes variable 3. Fitting instructions can include simple arithmetic operations. For example if data represent the sum of the first two species in a model the fitting instruction for that variable should be written \verb$species1+species2$. 
+ \item[Priors] For each parameter and initial condition we specify the distribution:
+\begin{itemize}
+\item constant  value
+\item normal location variance
+\item uniform lower upper
+\item lognormal location variance
+\end{itemize}
+\end{description}
+
+\subsection{Running StabilityChecker}
+
+\newpage
+
+
+\section{Extending the package}
+\label{extending}
+\subsection{Defining your own clustering algorithms}
+Defining custom distance functions is straightforward. The user needs to to pass the argument 
+
+\end{document}

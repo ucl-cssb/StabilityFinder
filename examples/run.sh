@@ -1,7 +1,5 @@
-#!/bin/sh
-export PYTHONPATH=$PYTHONPATH:/home/ucbtle1/code-packages/abc-sysbio-code/:/home/ucbtle1/code-packages/cuda-sim-code/:/home/ucbtle1/code-packages/sympy-0.7.3
-exe=/home/ucbtle1/code-packages/abc-sysbio-code/scripts/run-abc-sysbio
-
+export PYTHONPATH=$PYTHONPATH:/home/ucbtle1/.local/lib/python2.7/site-packages/stabilitychecker
+exe=/home/ucbtle1/.local/lib/python2.7/site-packages/stabilitychecker
 export CUDA_DEVICE=6
 
-python read_input.py; python my_abc.py
+python $exe/read_input.py; python $exe/my_abc.py;
