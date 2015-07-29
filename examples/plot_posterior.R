@@ -96,12 +96,12 @@ plot_posterior_distr <- function(limits, param_names, p_values_final){
 #  dev.off()
 #}
 
-p_values_final = read.table("../examples/results_txt_files/Parameter_values_final.txt")
-p_weights_final = read.table("../examples/results_txt_files/Parameter_weights_final.txt")
+p_values_final = read.table("results_txt_files/Parameter_values_final.txt")
+p_weights_final = read.table("results_txt_files/Parameter_weights_final.txt")
 p_values_final <- subset(p_values_final, select = -p_values_final[,1] )
 p_values_final$param_weights <- unlist(p_weights_final)
 
-doc = xmlInternalTreeParse("../examples/input_file.xml")
+doc = xmlInternalTreeParse("input_file.xml")
 top = xmlRoot(doc)
 df <- xmlToDataFrame(top[["parameters"]])
 lim <- df[-1, 3:4]
