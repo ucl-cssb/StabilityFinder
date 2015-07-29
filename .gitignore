@@ -1,6 +1,6 @@
 *.log
 ._*
-build/
+build/*
 env/
 develop-eggs/
 dist/
