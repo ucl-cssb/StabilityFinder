@@ -108,7 +108,6 @@ def central():
         pop_fold_res_path = 'Population_'+str(pop_indic+1)
         os.makedirs(str(results_path)+'/'+str(pop_fold_res_path))
         previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, alpha, accepted_distances)
-        logger.debug('epsilons: %s', epsilons)
         parameters_accepted = []
         accepted_distances = []
 
@@ -277,13 +276,8 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
         ss_res_set = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
         std_devs = steady_state_check.ss_check(ss_res_set)
-
         cluster_counter, clusters_means, total_variance, median_clust_var = deterministic_clustering.distance(set_result)
         distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2]), std_devs[0], std_devs[1]])
-        #elif read_input.stoch_determ == 'stochastic':
-        #    cluster_counter, clusters_means, total_variance, median_clust_var = gap_statistic.gap_statistic(set_result)
-        #    distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2]), std_devs[0], std_devs[1]])
-
     logger.info('Distance finished')
     logger.debug('Distance matrix: %s', distances_matrix)
     return distances_matrix
@@ -438,3 +432,4 @@ final_path_v = str(results_path)+'/Parameter_values_final.txt'
 final_path_w = str(results_path)+'/Parameter_weights_final.txt'
 numpy.savetxt(final_path_v, final_particles, delimiter=' ')
 numpy.savetxt(final_path_w, final_weights, delimiter=' ')
+logger.info('plotting..')

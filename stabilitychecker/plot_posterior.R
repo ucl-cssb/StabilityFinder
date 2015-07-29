@@ -3,18 +3,42 @@ library(gridExtra)
 library(XML)
 library(plyr)
 
-plot_posterior_distr <- function(limits, names){
+#Multiplot from R-cookbook.
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  plots <- c(list(...), plotlist)
 
-  #p_values_final = read.table(paste("results_txt_files/Parameter_values_final.txt",sep=''))
-  #p_weights_final = read.table(paste("results_txt_files/Parameter_weights_final.txt",sep=''))
-  #p_values_final <- subset(p_values_final, select = -p_values_final[,1] )
-  #p_values_final$param_weights <- unlist(p_weights_final)
+  numPlots = length(plots)
+
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+plot_posterior_distr <- function(limits, param_names, p_values_final){
+
   numb_params = length(param_names)-1
 
-  a=limits[1,]
-  b=limits[2,]
+  a=limits[,1]
+  b=limits[,2]
   pltList <- list()
-  #library(gridExtra)
   k=0
   for(i in 1:numb_params)
     for(j in 1:numb_params){
@@ -54,15 +78,22 @@ plot_posterior_distr <- function(limits, names){
                 #plot.margin=unit(c(0,0,-0.5,0), "lines"))
       }
     }
-  g <- do.call("arrangeGrob", c(pltList, list(ncol=ncol(p_values_final)-1, main=textGrob("bla", vjust=0.5, gp=gpar(fontsize=18, fontface="bold", fontsize=18)))))
-  ggsave(file=paste(results_path,"/",pop_fold_res_path,"/posterior.pdf",sep=''), g,width=9, height=9, dpi=300)
+  pdf('posterior.pdf', width=9, height=9)
+  multiplot(plotlist = pltList, cols = numb_params+1)
+  dev.off()
 }
 
-p_values_final = read.table(paste("results_txt_files/Parameter_values_final.txt",sep=''))
-p_weights_final = read.table(paste("results_txt_files/Parameter_weights_final.txt",sep=''))
+p_values_final = read.table(paste("../examples/results_txt_files/Parameter_values_final.txt",sep=''))
+p_weights_final = read.table(paste("../examples/results_txt_files/Parameter_weights_final.txt",sep=''))
 p_values_final <- subset(p_values_final, select = -p_values_final[,1] )
 p_values_final$param_weights <- unlist(p_weights_final)
-colnames(p_values_final) <- c("a1", "beta","a2","gama","weights")
-param_names <- c("a1", "beta","a2","gama","weights")
-limits <- cbind(c(0,10),c(0,10),c(0,10),c(0,10) )
-plot_posterior_distr(limits, param_names)
+
+doc = xmlInternalTreeParse("../examples/input_file.xml")
+top = xmlRoot(doc)
+df <- xmlToDataFrame(top[["parameters"]])
+pn <- df[-1,1]
+param_names <- c(pn,"weights")
+colnames(p_values_final) = c(pn,"weights")
+
+limits <- df[-1, 3:4]
+plot_posterior_distr(limits, param_names, p_values_final)
