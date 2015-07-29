@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 
 def kmeans(data, number_centroids):
 
-    logging.basicConfig(filename='clustering.log', level=logging.DEBUG)
-    logger = logging.getLogger(__name__)
+    #logging.basicConfig(filename='clustering.log', level=logging.DEBUG)
+    #logger = logging.getLogger(__name__)
     #logger.propagate = False
 
     def update_centroids(old_centroid, values):
@@ -20,9 +20,9 @@ def kmeans(data, number_centroids):
         unzipped = zip(*values)
         # Calculate the mean for each dimension
         centroid_coords = [math.fsum(dList)/numPoints for dList in unzipped]
-        logger.debug('centroid coords: %s', centroid_coords)
+        #logger.debug('centroid coords: %s', centroid_coords)
         shift = getDistance(centroid_coords, old_centroid)
-        logger.debug('shift: %s', shift)
+        #logger.debug('shift: %s', shift)
         return shift, centroid_coords
 
     def getDistance(a, b):
@@ -37,7 +37,7 @@ def kmeans(data, number_centroids):
         var = np.var(cluster)
         return var
 
-    logger.debug('number_centroids: %s', number_centroids)
+    #logger.debug('number_centroids: %s', number_centroids)
     cutoff = 0.001
     clusters_centroids = {}
     clusters_variance = {}
@@ -46,15 +46,15 @@ def kmeans(data, number_centroids):
     initial = random.sample(data, number_centroids)
     #this makes it break, due to a bad initial clustering centres
     #initial = [[1.69160347, 1.55470384], [1.93198557, 1.58238697], [0.35464153, 1.38295475]]
-    logger.debug('initial: %s', initial)
+    #logger.debug('initial: %s', initial)
     for i in range(number_centroids):
         clusters['Cluster '+str(i+1)] = [initial[i]]
         clusters_centroids['Cluster '+str(i+1)] = initial[i]
-    logger.debug('clusters: %s', clusters)
+    #logger.debug('clusters: %s', clusters)
 
     while True:
         loopCounter += 1
-        logger.info('loopcounter: %s', loopCounter)
+        #logger.info('loopcounter: %s', loopCounter)
         # For every point in the dataset ...
         for p in data:
             dist_comp = []
@@ -71,10 +71,10 @@ def kmeans(data, number_centroids):
             shift, clusters_centroids['Cluster '+str(j)] = update_centroids(clusters_centroids['Cluster '+str(j)], clusters['Cluster '+str(j)])
             # Keep track of the largest move from all cluster centroid updates
             biggest_shift = max(biggest_shift, shift)
-        logger.debug('biggest shift: %s', biggest_shift)
+        #logger.debug('biggest shift: %s', biggest_shift)
 
         if biggest_shift < cutoff:
-            logger.info('Converged after %s iterations', loopCounter)
+            #logger.info('Converged after %s iterations', loopCounter)
             total_variance = tot_variance(data)
             keys_clust = clusters.keys()
             keys_clust.sort()

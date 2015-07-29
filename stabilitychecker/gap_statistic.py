@@ -44,7 +44,6 @@ def gap_statistic(X):
     Wkbs = np.zeros(len(ks))
     sk = np.zeros(len(ks))
     for indk, k in enumerate(ks):
-        print k
         clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(X, k)
         total_variances.append(total_variance)
         median_cluster_variances.append(median_clust_var)
@@ -78,7 +77,6 @@ def distance(data):
     cluster_counter = 1
     for i in range(len(gaps)):
         cluster_counter += 1
-        print 'cluster', cluster_counter
         if gaps[i] >= (gaps[i+1]-sk[i+1]):
             #print 'The optimum number of clusters is: %s', cluster_counter
             break

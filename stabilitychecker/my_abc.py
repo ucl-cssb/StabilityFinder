@@ -10,9 +10,7 @@ import gap_statistic
 import logging
 import steady_state_check
 import math
-import sys
 import os
-sys.path.append("/home/ucbtle1/cuda-sim-code")
 import cudasim
 import cudasim.Lsoda as Lsoda
 import cudasim.EulerMaruyama as EulerMaruyama
@@ -38,6 +36,8 @@ def central():
     init_cond_to_sample = int(read_input.initial_conditions_samples)
     alpha = math.ceil(float(read_input.alpha)*number_particles)
     stoch_determ = read_input.stoch_determ
+    model_file = read_input.model_file
+    sbml_name = read_input.sbml_name
     logger.debug('alpha: %s', alpha)
     species_numb_to_fit = read_input.species_numb_to_fit_lst
     logger.debug('number of particles: %s', number_particles)
@@ -69,8 +69,9 @@ def central():
 
         while finished == 'false':
             parameters_sampled = sample_priors(number_to_sample)
-
-            cudasim_result = simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample)
+            if model_file == 'sbml':
+                write_cuda(stoch_determ, sbml_name)
+            cudasim_result = simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample,stoch_determ)
             distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ)
             parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, parameters_sampled, epsilons)
             for i in parameters_sampled:
@@ -114,7 +115,7 @@ def central():
         while finished == 'false':
             parameters_sampled, current_sampled_weights = sample_params(previous_parameters, previous_weights_list, number_to_sample)
             perturbed_particles, previous_weights_list = perturb_particles(parameters_sampled, current_sampled_weights, pop_indic)
-            cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample)
+            cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample,stoch_determ)
             distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ)
             parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, perturbed_particles, epsilons)
             # Append the accepted ones to a matrix which will be built up until you reach the number of particles you want
@@ -225,9 +226,22 @@ def sample_params(parameters_accepted, current_weights_list, number_to_sample):
     logger.debug('Number of particle weights: %s', len(weights_val_list))
     return parameters_list, weights_val_list
 
+def write_cuda(stoch_determ, sbml_name):
+    import cudasim.SBMLParser as Parser
+    #Location of SBML model file
+    xmlModel = sbml_name+'.xml'
+    name = 'test'
+    # create CUDA code from SBML model
+    if stoch_determ == 'deterministic':
+        logger.info('making deterministic cuda file')
+        Parser.importSBMLCUDA([xmlModel], ['ODE'], ModelName=[name])
+    elif stoch_determ == 'stochastic':
+        logger.info('making stochastic cuda file')
+        Parser.importSBMLCUDA([xmlModel], ['SDE'], ModelName=[name])
+    return
 
-def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
-       
+def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, stoch_determ):
+
     init_cond_list = []
     number_species = len(read_input.ics)
     #Here multiply the 'parameters' martix, to repeat each line 100 times, keeping the same order. this is so that the initial conditions and parameters matrices are equal.
@@ -244,31 +258,30 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample):
     logger.debug('Length of expanded parameters list: %s', len(expanded_params_list))
     logger.debug('Length of initial conditions list: %s', len(init_cond_list))
 
-    """    Simulate dataset """
-    ###############	Create cuda code of model	###########
-    #import cudasim.SBMLParser as Parser
-    #Location of SBML model file
-    #xmlModel = 'sw_std_dim_deg_sym_sbml.xml'
-    #name = 'model'
-    # create CUDA code from SBML model
-    #Parser.importSBMLCUDA([xmlModel], ['SDE'], ModelName=[name])
-    #########################################################
-
     times = read_input.times
     #CUDA SIM BIT
     cudaCode = 'model.cu'
-    logger.info('Simulating...')
-    modelInstance = Lsoda.Lsoda(times, cudaCode, dt=0.1)
+    if stoch_determ == 'deterministic':
+        logger.info(' Simulating deterministically...')
+        modelInstance = Lsoda.Lsoda(times, cudaCode, dt=-1)
+    elif stoch_determ == 'stochastic':
+        logger.info('Simulating stochastically...')
+        modelInstance = EulerMaruyama.EulerMaruyama(times, cudaCode, dt=0.1)
     result = modelInstance.run(expanded_params_list, init_cond_list)
     #logger.debug('simulation result: %s', result)
     #[#threads][#beta][#timepoints][#speciesNumber]
     logger.info('finished')
+
     return result
 
 def measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ):
 
     logger.info('Distance module called')
     distances_matrix = []
+    if stoch_determ == 'deterministic':
+        logger.info(' Simulating deterministically...')
+    elif stoch_determ == 'stochastic':
+        logger.info('Simulating stochastically...')
     for i in range(0, int(number_to_sample)):
         range_start = i*int(init_cond_to_sample)
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample) - 1
@@ -276,7 +289,10 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
         ss_res_set = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
         std_devs = steady_state_check.ss_check(ss_res_set)
-        cluster_counter, clusters_means, total_variance, median_clust_var = deterministic_clustering.distance(set_result)
+        if stoch_determ == 'deterministic':
+            cluster_counter, clusters_means, total_variance, median_clust_var = deterministic_clustering.distance(set_result)
+        elif stoch_determ == 'stochastic':
+            cluster_counter, clusters_means, total_variance, median_clust_var = gap_statistic.distance(set_result)
         distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2]), std_devs[0], std_devs[1]])
     logger.info('Distance finished')
     logger.debug('Distance matrix: %s', distances_matrix)

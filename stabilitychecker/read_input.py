@@ -28,6 +28,11 @@ spec_numb_fit = document.find('species_numb_to_fit')
 species_numb_to_fit_lst = spec_numb_fit.text.split()
 stoch_det = document.find('stoch_determ')
 stoch_determ = stoch_det.text
+mod_file = document.find('model_file')
+model_file = mod_file.text
+sbml = document.find('sbml_name')
+sbml_name = sbml.text
+
 
 lims = []
 ics = []

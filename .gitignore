@@ -15,3 +15,4 @@ lib/
 .idea
 results_txt_files*/
 *._.DS_Store
+*.pyc
