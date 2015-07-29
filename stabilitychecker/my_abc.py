@@ -432,4 +432,3 @@ final_path_v = str(results_path)+'/Parameter_values_final.txt'
 final_path_w = str(results_path)+'/Parameter_weights_final.txt'
 numpy.savetxt(final_path_v, final_particles, delimiter=' ')
 numpy.savetxt(final_path_w, final_weights, delimiter=' ')
-logger.info('plotting..')

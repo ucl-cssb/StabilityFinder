@@ -22,13 +22,13 @@
     </number_of_clusters>
 
     <total_variance>
-         <start>100</start>
-        <end>10</end>
+         <start>10</start>
+        <end>1</end>
     </total_variance>
 
     <cluster_variance>
-        <start>10</start>
-        <end>10</end>
+        <start>100</start>
+        <end>1</end>
     </cluster_variance>
 
     <particles>10</particles>
@@ -50,7 +50,7 @@
             <end>NA</end>
         </item>
 
-        <item>s
+        <item>
             <name>a1</name>
             <distribution>uniform</distribution>
             <start>0</start>
