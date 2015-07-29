@@ -230,7 +230,7 @@ def write_cuda(stoch_determ, sbml_name):
     import cudasim.SBMLParser as Parser
     #Location of SBML model file
     xmlModel = sbml_name+'.xml'
-    name = 'test'
+    name = 'model'
     # create CUDA code from SBML model
     if stoch_determ == 'deterministic':
         logger.info('making deterministic cuda file')

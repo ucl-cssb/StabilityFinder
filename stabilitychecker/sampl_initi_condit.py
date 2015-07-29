@@ -13,6 +13,7 @@ def sample_init(number_to_sample, init_cond_to_sample):
         p += 1
         if i[0] == 'constant':
             vals.append(float(i[1]))
+
         if i[0] == 'uniform':
             vals.append(1)
             limits.append(float(i[1]))
