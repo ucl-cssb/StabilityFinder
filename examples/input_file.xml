@@ -44,7 +44,7 @@
     #deterministic or stochastic
     <stoch_determ>deterministic</stoch_determ>
     #sbml or cuda
-    <model_file>sbml</model_file>
+    <model_file>cuda</model_file>
     <sbml_name>model</sbml_name>
     <parameters>
         <item>
