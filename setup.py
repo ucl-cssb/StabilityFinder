@@ -7,5 +7,7 @@ setup(name='stabilitychecker',
       author_email='miriam.leon.12@ucl.ac.uk',
       url='https://github.com/Mirelio/StabilityChecker.git',
       packages=['stabilitychecker'],
+      package_data={
+          '':['*.R']
+      }
      )
-

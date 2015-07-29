@@ -31,6 +31,8 @@ for data in root:
         times = data.text.split()
     elif data.tag == "species_numb_to_fit":
         species_numb_to_fit_lst = data.text.split()
+    elif data.tag == "stoch_determ":
+        stoch_determ = data.text
     elif data.tag == "parameters":
         for child in data:
             lims.append(child.text.split())
