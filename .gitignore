@@ -1,0 +1,16 @@
+*.log
+._*
+build/
+env/
+develop-eggs/
+dist/
+eggs/
+lib/
+*.egg-info/
+*.egg
+.installed.cfg
+*.manisfest
+*.spec
+.DS_Store
+.idea
+results_txt_files*/
