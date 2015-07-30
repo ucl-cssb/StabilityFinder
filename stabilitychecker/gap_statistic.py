@@ -36,7 +36,7 @@ def bounding_box(X):
 def gap_statistic(X):
     (xmin, xmax), (ymin, ymax) = bounding_box(X)
     # Dispersion for real distribution
-    ks = [1, 2, 3, 4]
+    ks = [2, 3, 4]
     data_centrs = []
     clusts = []
     median_cluster_variances = []
