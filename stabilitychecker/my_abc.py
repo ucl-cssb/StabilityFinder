@@ -237,7 +237,7 @@ def write_cuda(stoch_determ, sbml_name):
         Parser.importSBMLCUDA([xmlModel], ['ODE'], ModelName=[name])
     elif stoch_determ == 'stochastic':
         logger.info('making stochastic cuda file')
-        Parser.importSBMLCUDA([xmlModel], ['SDE'], ModelName=[name])
+        Parser.importSBMLCUDA([xmlModel], ['MJP'], ModelName=[name])
     return
 
 def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, stoch_determ):
@@ -266,7 +266,7 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, 
         modelInstance = Lsoda.Lsoda(times, cudaCode, dt=-1)
     elif stoch_determ == 'stochastic':
         logger.info('Simulating stochastically...')
-        modelInstance = EulerMaruyama.EulerMaruyama(times, cudaCode, dt=0.1)
+        modelInstance = Gillespie.Gillespie(times, cudaCode, dt=0.1)
     result = modelInstance.run(expanded_params_list, init_cond_list)
     #logger.debug('simulation result: %s', result)
     #[#threads][#beta][#timepoints][#speciesNumber]
@@ -279,19 +279,23 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
     logger.info('Distance module called')
     distances_matrix = []
     if stoch_determ == 'deterministic':
-        logger.info(' Simulating deterministically...')
+        logger.info(' Distance (deterministic)...')
     elif stoch_determ == 'stochastic':
-        logger.info('Simulating stochastically...')
+        logger.info('Distance (gap statistic)...')
     for i in range(0, int(number_to_sample)):
         range_start = i*int(init_cond_to_sample)
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample) - 1
         #[#threads][#beta][#timepoints][#speciesNumber]
+        logger.debug('data: %s', cudasim_result)
         set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
         ss_res_set = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
+
+        logger.debug('set_result: %s', set_result)
         std_devs = steady_state_check.ss_check(ss_res_set)
         if stoch_determ == 'deterministic':
             cluster_counter, clusters_means, total_variance, median_clust_var = deterministic_clustering.distance(set_result)
         elif stoch_determ == 'stochastic':
+            #print set_result
             cluster_counter, clusters_means, total_variance, median_clust_var = gap_statistic.distance(set_result)
         distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2]), std_devs[0], std_devs[1]])
     logger.info('Distance finished')

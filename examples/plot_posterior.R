@@ -4,47 +4,20 @@ library(XML)
 library(plyr)
 library(grid)
 
-#Multiplot from R-cookbook.
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  library(grid)
-  plots <- c(list(...), plotlist)
-
-  numPlots = length(plots)
-
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                    ncol = cols, nrow = ceiling(numPlots/cols))
-  }
- if (numPlots==1) {
-    print(plots[[1]])
-
-  } else {
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
 
 plot_posterior_distr <- function(limits, param_names, p_values_final){
 
   numb_params = length(param_names)-1
-
-  a=limits[,1]
-  b=limits[,2]
+  a=as.numeric(limits[,1])
+  b=as.numeric(limits[,2])
   pltList <- list()
   k=0
   for(i in 1:numb_params)
     for(j in 1:numb_params){
       k=k+1
       if(i==j){
+      print(a[i])
+      print(b[i])
         pltList[[k]] <-ggplot(p_values_final, aes_string(x=param_names[i], weight=param_names[ncol(p_values_final)])) + geom_density(fill="grey") + xlim(a[i],b[i])+ ggtitle(param_names[i]) +
           theme(axis.line=element_blank(),
                 plot.title=element_text(size=8, hjust=0,lineheight=0),
@@ -109,7 +82,5 @@ limits <- do.call(cbind, lapply(df[-1, 3:4], as.vector))
 param_nam <- do.call(cbind, lapply(df[-1,1], as.character))
 param_names <- c(param_nam,"weights")
 colnames(p_values_final) = c(param_nam,"weights")
-a=as.numeric(limits[,1])
-b=as.numeric(limits[,2])
 
 plot_posterior_distr(limits, param_names, p_values_final)
