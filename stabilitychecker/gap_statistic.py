@@ -118,11 +118,13 @@ def distance(data):
     cluster_counter = 1
     for i in range(len(gaps)):
         cluster_counter += 1
+	if i == len(gaps):
+	    cluster_counter = len(gaps)
+	    break
         if gaps[i] >= (gaps[i+1]-sk[i+1]):
             #logger.debug('optimum number of clusters is: ', cluster_counter)
             #print 'The optimum number of clusters is: ', cluster_counter
             break
-
     return cluster_counter, clusters_means, total_variances[cluster_counter-1],  median_cluster_variances[cluster_counter-1]
 
 if __name__ == "__main__":
