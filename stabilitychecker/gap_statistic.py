@@ -118,7 +118,7 @@ def distance(data):
     cluster_counter = 1
     for i in range(len(gaps)):
         cluster_counter += 1
-	if i == len(gaps):
+	if i == len(gaps)-1:
 	    cluster_counter = len(gaps)
 	    break
         if gaps[i] >= (gaps[i+1]-sk[i+1]):
