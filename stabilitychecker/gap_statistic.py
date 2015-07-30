@@ -62,7 +62,10 @@ def gap_statistic(X):
             median_clust_var_tmp.append(median_clust_var)
             #calculate wk for eack k for the data
             tmp_Wks.append(np.log(Wk(clusters_centroids, clusters)))
-        Wks[indk] = np.median(np.array(tmp_Wks))
+        if len(tmp_Wks) == 3:
+            Wks[indk] = np.median(np.array(tmp_Wks))
+        else:
+            Wks[indk] = np.min(np.array(tmp_Wks))
         idx = tmp_Wks.index(Wks[indk])
         total_variances.append(total_variance_tmp[idx])
         median_cluster_variances.append(median_clust_var_tmp[idx])
