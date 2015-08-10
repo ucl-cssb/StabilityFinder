@@ -16,3 +16,9 @@ lib/
 results_txt_files*/
 *._.DS_Store
 *.pyc
+docs/.texpadtmp
+docs/StabilityCheckerDocumentation.tex
+docs/posterior.pdf
+examples/nohup.out
+examples/posterior.pdf
+
