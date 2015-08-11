@@ -67,36 +67,36 @@ def kmeans(data, number_centroids):
             clusters[keys_m[ind]].append(p)
         #if one of the clusters is emty, it breaks. this is if two cluster centres are initialised identically.
         #work-around: make them share the points in their clusters
-        empty_keys = []
-        for i in range(len(keys_m)):
-            if len(clusters['Cluster '+str(i+1)]) == 0:
-                empty_keys.append('Cluster '+str(i+1))
-                for key, value in clusters_centroids.iteritems():
-                    if value == clusters_centroids['Cluster '+str(i+1)]:
-                        if len(clusters[key]) == 0:
-                            empty_keys.append('Cluster '+str(i+1))
-                        if len(clusters[key]) != 0:
-                            share_from = key
-
-        if len(empty_keys) != 0:
-            empty_keys = list(set(empty_keys))
-            empty_keys.append(share_from)
-            clusters[share_from] = [x for x in clusters[share_from] if x != []]
-            divis = len(clusters[share_from])/(len(empty_keys))
-            share = int(math.floor(divis))
-            for i in range(len(empty_keys)):
-                range_start = i*int(share)
-                range_end = i*int(share) + int(share) - 1
-                if i == len(empty_keys)-1:
-                    if len(clusters[share_from]) % 2 == 0:
-                        tmp = clusters[share_from][range_start:range_end]
-                        clusters[empty_keys[i]] = tmp
-                    else:
-                        tmp = clusters[share_from][range_start:range_end+1]
-                        clusters[empty_keys[i]] = tmp
-                else:
-                    clusters[empty_keys[i]] = clusters[share_from][range_start:range_end]
-        #if clusters_centroids['Cluster '+str(i+1)] in clusters_centroids.values()
+        # empty_keys = []
+        # for i in range(len(keys_m)):
+        #     if len(clusters['Cluster '+str(i+1)]) == 0:
+        #         empty_keys.append('Cluster '+str(i+1))
+        #         for key, value in clusters_centroids.iteritems():
+        #             if value == clusters_centroids['Cluster '+str(i+1)]:
+        #                 if len(clusters[key]) == 0:
+        #                     empty_keys.append('Cluster '+str(i+1))
+        #                 if len(clusters[key]) != 0:
+        #                     share_from = key
+        #
+        # if len(empty_keys) != 0:
+        #     empty_keys = list(set(empty_keys))
+        #     empty_keys.append(share_from)
+        #     clusters[share_from] = [x for x in clusters[share_from] if x != []]
+        #     divis = len(clusters[share_from])/(len(empty_keys))
+        #     share = int(math.floor(divis))
+        #     for i in range(len(empty_keys)):
+        #         range_start = i*int(share)
+        #         range_end = i*int(share) + int(share) - 1
+        #         if i == len(empty_keys)-1:
+        #             if len(clusters[share_from]) % 2 == 0:
+        #                 tmp = clusters[share_from][range_start:range_end]
+        #                 clusters[empty_keys[i]] = tmp
+        #             else:
+        #                 tmp = clusters[share_from][range_start:range_end+1]
+        #                 clusters[empty_keys[i]] = tmp
+        #         else:
+        #             clusters[empty_keys[i]] = clusters[share_from][range_start:range_end]
+        # #if clusters_centroids['Cluster '+str(i+1)] in clusters_centroids.values()
 
         biggest_shift = 0.0
         # As many times as there are clusters ...
