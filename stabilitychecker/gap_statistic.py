@@ -51,7 +51,6 @@ def gap_statistic(X):
         clusters_tmp = []
         total_variance_tmp = []
         median_clust_var_tmp = []
-        logger.info('Now testing k = %s', k)
         #Test each k 3 times and take the median
         for i in range(3):
             try:

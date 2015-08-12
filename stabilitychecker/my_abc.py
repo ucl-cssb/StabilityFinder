@@ -109,6 +109,18 @@ def central():
         pop_fold_res_path = 'Population_'+str(pop_indic+1)
         os.makedirs(str(results_path)+'/'+str(pop_fold_res_path))
         previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, alpha, accepted_distances)
+        if epsilons[0] < epsilons_final[0]:
+            logger.debug('Number of clusters e was: %s', epsilons[0])
+            epsilons[0] = epsilons_final[0]
+            logger.debug('and now set back up to: %s', epsilons[0])
+        if epsilons[1] < epsilons_final[1]:
+            logger.debug('Total variance e was: %s', epsilons[1])
+            epsilons[1] = epsilons_final[1]
+            logger.debug('and now set back up to: %s', epsilons[1])
+        if epsilons[2] < epsilons_final[2]:
+            logger.debug('Cluster variance e was: %s', epsilons[2])
+            epsilons[2] = epsilons_final[2]
+            logger.debug('and now set back up to: %s', epsilons[2])
         parameters_accepted = []
         accepted_distances = []
 
@@ -161,9 +173,7 @@ def prepare_next_pop(parameters_accepted, current_weights_list, alpha, distances
     distances_matrix.sort(key=operator.itemgetter(0, 1, 2))
     epsilon_cl_current = distances_matrix[int(alpha)][0]
     epsilon_t_current = distances_matrix[int(alpha)][1]
-    #epsilon_t_current = round(epsilon_t_current, 4)
     epsilon_vcl_current = distances_matrix[int(alpha)][2]
-    #epsilon_vcl_current = round(epsilon_vcl_current, 4)
     epsilons = [epsilon_cl_current, epsilon_t_current, epsilon_vcl_current]
     logger.debug('epsilons: %s', epsilons)
     return parameters_accepted, current_weights_list, epsilons
