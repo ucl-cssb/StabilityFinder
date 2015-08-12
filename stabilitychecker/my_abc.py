@@ -286,16 +286,14 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         range_start = i*int(init_cond_to_sample)
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample) - 1
         #[#threads][#beta][#timepoints][#speciesNumber]
-        logger.debug('data: %s', cudasim_result)
         set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
         ss_res_set = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
 
-        logger.debug('set_result: %s', set_result)
         std_devs = steady_state_check.ss_check(ss_res_set)
         if stoch_determ == 'deterministic':
             cluster_counter, clusters_means, total_variance, median_clust_var = deterministic_clustering.distance(set_result)
         elif stoch_determ == 'stochastic':
-            #print set_result
+            #set_resprint set_result
             cluster_counter, clusters_means, total_variance, median_clust_var = gap_statistic.distance(set_result)
         distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2]), std_devs[0], std_devs[1]])
     logger.info('Distance finished')

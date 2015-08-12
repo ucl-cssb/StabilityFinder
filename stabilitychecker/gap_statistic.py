@@ -10,7 +10,9 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 #import scipy
-#import logging
+import logging
+logging.basicConfig(filename='my_abc_scan.log', level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 def Wk(clusters_centroids, clusters):
    #k is the number of clusters
@@ -18,7 +20,6 @@ def Wk(clusters_centroids, clusters):
    #for each cluster
    dk = []
    for i in range(K):
-       #print clusters['Cluster '+str(i+1)]
        #for each point in the cluster
        dk_pre = []
        for c in clusters['Cluster '+str(i+1)]:
@@ -50,12 +51,15 @@ def gap_statistic(X):
         clusters_tmp = []
         total_variance_tmp = []
         median_clust_var_tmp = []
+        logger.info('Now testing k = %s', k)
+        #Test each k 3 times and take the median
         for i in range(3):
-            #try:
-            clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(X, k)
+            try:
+                clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(X, k)
 
-            #except: # catch all exceptions
-            #    continue
+            except: # catch all exceptions
+                logger.debug('Failed at k: %s ', k)
+                continue
             clusters_centroids_tmp.append(clusters_centroids)
             clusters_tmp.append(clusters)
             total_variance_tmp.append(total_variance)
@@ -91,9 +95,8 @@ def gap_statistic(X):
 
 def distance(data):
 
-    #logging.basicConfig(filename='gap.log', level=logging.DEBUG)
-    #logger = logging.getLogger(__name__)
-
+    #Jitter is added to the data because when you have integers as data they overlap and the clusters fail.
+    # if centres are chosen as points with the same coordinates, all the surrounding points will be assigned to only one of them and one centre will remain empty
     def rand_jitter(arr):
         stdev = .01*(max(arr)-min(arr))
         mu = np.mean(arr)
@@ -110,20 +113,18 @@ def distance(data):
 
     ks, logWks, logWkbs, sk, clusters_means, clusts, total_variances, median_cluster_variances = gap_statistic(data)
     gaps = []
-    #logger.info('calculating gaps')
     for i in range(len(ks)):
         gaps.append(logWkbs[i]-logWks[i])
     #Find the smallest k such that Gap(k) > Gap(k+1) -  std_{k+1}
-    #logger.debug('gaps: %s', gaps)
     cluster_counter = 0
     for i in range(len(gaps)):
         cluster_counter += 1
+        #If you are at the last one and hasn't found one yet, the last one is your answer
         if i == len(gaps)-1:
             cluster_counter = len(gaps)
             break
         if gaps[i] >= (gaps[i+1]-sk[i+1]):
-            #logger.debug('optimum number of clusters is: ', cluster_counter)
-            print 'The optimum number of clusters is: ', cluster_counter
+            logger.debug('optimum number of clusters is: %s', cluster_counter)
             break
     return cluster_counter, clusters_means, total_variances[cluster_counter-1],  median_cluster_variances[cluster_counter-1]
 
