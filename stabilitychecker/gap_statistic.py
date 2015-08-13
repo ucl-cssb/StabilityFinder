@@ -11,7 +11,7 @@ import random
 import matplotlib.pyplot as plt
 #import scipy
 import logging
-logging.basicConfig(filename='my_abc_scan.log', level=logging.DEBUG)
+logging.basicConfig(filename='stabilCheck.log', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def Wk(clusters_centroids, clusters):

@@ -17,17 +17,17 @@ import cudasim.EulerMaruyama as EulerMaruyama
 import cudasim.Gillespie as Gillespie
 
 
-logging.basicConfig(filename='my_abc_scan.log', level=logging.DEBUG)
+logging.basicConfig(filename='stabilCheck.log', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 def central():
-    logging.info('ABC started')
+    #logging.info('ABC started')
     if not os.path.exists('results_txt_files'):
         os.makedirs('results_txt_files')
         logger.info('Made results directory')
     else:
-        logger.debug('directory already existed')
+        logger.info('directory already existed')
     results_path = 'results_txt_files'
     start = time.time()
     number_particles = int(read_input.number_particles)
@@ -41,8 +41,8 @@ def central():
     species_numb_to_fit = read_input.species_numb_to_fit_lst
     logger.debug('number of particles: %s', number_particles)
     logger.debug('number_to_sample: %s', number_to_sample)
-    logger.debug('species_numb_to_fit: %s', species_numb_to_fit)
-    logger.debug('Simulate using: %s', stoch_determ)
+    logger.info('species_numb_to_fit: %s', species_numb_to_fit)
+    logger.info('Simulate using: %s', stoch_determ)
     pop_indic = 0
     current_weights_list = []
     parameters_accepted = []
@@ -83,14 +83,14 @@ def central():
                 parameters_accepted = parameters_accepted[0:int(read_input.number_particles)]
                 accepted_distances = accepted_distances[0:int(read_input.number_particles)]
                 finished = 'true'
-                logger.info('Reached number of particles ')
+                #logger.info('Reached number of particles ')
             elif len(parameters_accepted) < float(read_input.number_particles):
                 finished = 'false'
-                logger.info('Not reached number of particles, sampling again')
+                #logger.info('Not reached number of particles, sampling again')
                 logger.info('Total number of particles accepted: %s', len(parameters_accepted))
             if finished == 'true':
                 logger.info('accepted_distances: %s', len(accepted_distances))
-                logger.info('param_acc length: %s', len(parameters_accepted))
+                #logger.info('param_acc length: %s', len(parameters_accepted))
                 break
 
         pop_fold_res_path = 'Population_'+str(pop_indic+1)
@@ -256,7 +256,7 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, 
     #Here multiply the 'parameters' martix, to repeat each line 100 times, keeping the same order. this is so that the initial conditions and parameters matrices are equal.
     #There are 100 initial conditions per parameter set
     expanded_params_list = []
-    logger.info('Expanding parameters list to match initial conditions')
+    logger.debug('Expanding parameters list to match initial conditions')
     logger.debug('Length of parameters list: %s', len(parameters_sampled))
     for i in parameters_sampled:
         for j in range(0, init_cond_to_sample):
@@ -285,7 +285,7 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, 
 
 def measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ):
 
-    logger.info('Distance module called')
+    logger.debug('Distance module called')
     distances_matrix = []
     if stoch_determ == 'deterministic':
         logger.info(' Distance (deterministic)...')
@@ -296,12 +296,15 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample) - 1
         #[#threads][#beta][#timepoints][#speciesNumber]
         #cudasim_result = numpy.asarray(cudasim_result)
-        set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
-        ss_res_set = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
-
+        set_result1 = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1]
+        set_result2 = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[1])-1]
+        set_result = zip(set_result1, set_result2)
+        ss_res_set1 = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1]
+        ss_res_set2 = cudasim_result[range_start:range_end, 0, -10:,int(species_numb_to_fit[1])-1]
+        ss_res_set = zip(ss_res_set1, ss_res_set2)
         std_devs = steady_state_check.ss_check(ss_res_set)
         if stoch_determ == 'deterministic':
-            logger.debug('set_result: %s', set_result )
+            #logger.debug('set_result: %s', set_result )
             cluster_counter, clusters_means, total_variance, median_clust_var = deterministic_clustering.distance(set_result)
         elif stoch_determ == 'stochastic':
             #set_resprint set_result
