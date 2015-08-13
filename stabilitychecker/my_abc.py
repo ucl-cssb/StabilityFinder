@@ -108,18 +108,18 @@ def central():
         pop_fold_res_path = 'Population_'+str(pop_indic+1)
         os.makedirs(str(results_path)+'/'+str(pop_fold_res_path))
         previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, alpha, accepted_distances)
-        if epsilons[0] < epsilons_final[0]:
-            logger.debug('Number of clusters e was: %s', epsilons[0])
-            epsilons[0] = epsilons_final[0]
-            logger.debug('and now set back up to: %s', epsilons[0])
-        if epsilons[1] < epsilons_final[1]:
-            logger.debug('Total variance e was: %s', epsilons[1])
-            epsilons[1] = epsilons_final[1]
-            logger.debug('and now set back up to: %s', epsilons[1])
-        if epsilons[2] < epsilons_final[2]:
-            logger.debug('Cluster variance e was: %s', epsilons[2])
-            epsilons[2] = epsilons_final[2]
-            logger.debug('and now set back up to: %s', epsilons[2])
+        # if epsilons[0] < epsilons_final[0]:
+        #     logger.debug('Number of clusters e was: %s', epsilons[0])
+        #     epsilons[0] = epsilons_final[0]
+        #     logger.debug('and now set back up to: %s', epsilons[0])
+        # if epsilons[1] < epsilons_final[1]:
+        #     logger.debug('Total variance e was: %s', epsilons[1])
+        #     epsilons[1] = epsilons_final[1]
+        #     logger.debug('and now set back up to: %s', epsilons[1])
+        # if epsilons[2] < epsilons_final[2]:
+        #     logger.debug('Cluster variance e was: %s', epsilons[2])
+        #     epsilons[2] = epsilons_final[2]
+        #     logger.debug('and now set back up to: %s', epsilons[2])
         parameters_accepted = []
         accepted_distances = []
 
@@ -295,11 +295,13 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         range_start = i*int(init_cond_to_sample)
         range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample) - 1
         #[#threads][#beta][#timepoints][#speciesNumber]
+        #cudasim_result = numpy.asarray(cudasim_result)
         set_result = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
         ss_res_set = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
 
         std_devs = steady_state_check.ss_check(ss_res_set)
         if stoch_determ == 'deterministic':
+            logger.debug('set_result: %s', set_result )
             cluster_counter, clusters_means, total_variance, median_clust_var = deterministic_clustering.distance(set_result)
         elif stoch_determ == 'stochastic':
             #set_resprint set_result
