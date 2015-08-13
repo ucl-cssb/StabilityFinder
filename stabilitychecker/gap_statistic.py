@@ -52,7 +52,7 @@ def gap_statistic(X):
         total_variance_tmp = []
         median_clust_var_tmp = []
         #Test each k 3 times and take the median
-        for i in range(3):
+        for i in range(5):
             try:
                 clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(X, k)
 
@@ -65,10 +65,11 @@ def gap_statistic(X):
             median_clust_var_tmp.append(median_clust_var)
             #calculate wk for eack k for the data
             tmp_Wks.append(np.log(Wk(clusters_centroids, clusters)))
-        if len(tmp_Wks) == 3:
+        if len(tmp_Wks) % 2 != 0:
             Wks[indk] = np.median(np.array(tmp_Wks))
         else:
-            Wks[indk] = np.min(np.array(tmp_Wks))
+            mid = len(tmp_Wks)/2
+            Wks[indk] = tmp_Wks[mid]
         idx = tmp_Wks.index(Wks[indk])
         total_variances.append(total_variance_tmp[idx])
         median_cluster_variances.append(median_clust_var_tmp[idx])
@@ -118,9 +119,9 @@ def distance(data):
     cluster_counter = 0
     for i in range(len(gaps)):
         cluster_counter += 1
-        #If you are at the last one and hasn't found one yet, the last one is your answer
+        #If you are at the last one and hasn't found one yet, there is no clustering
         if i == len(gaps)-1:
-            cluster_counter = len(gaps)
+            cluster_counter = 1
             break
         if gaps[i] >= (gaps[i+1]-sk[i+1]):
             logger.debug('optimum number of clusters is: %s', cluster_counter)

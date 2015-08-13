@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 
 def central():
     logging.info('ABC started')
-    #for i in range(1, 10):
     if not os.path.exists('results_txt_files'):
         os.makedirs('results_txt_files')
         logger.info('Made results directory')

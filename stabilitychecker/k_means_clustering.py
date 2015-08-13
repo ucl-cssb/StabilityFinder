@@ -33,7 +33,7 @@ def kmeans(data, number_centroids):
         var = np.var(cluster)
         return var
 
-    cutoff = 0.001
+    cutoff = 0.00001
     clusters_centroids = {}
     clusters_variance = {}
     clusters = {}
