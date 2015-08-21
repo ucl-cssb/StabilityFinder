@@ -57,7 +57,7 @@ def kmeans(data, number_centroids):
                 dist_comp.append(getDistance(p, clusters_centroids[keys_m[cl]]))
             ind = dist_comp.index(min(dist_comp))
             clusters[keys_m[ind]].append(p)
-        #if one of the clusters is emty, it breaks. this is if two cluster centres are initialised identically.
+        #if one of the clusters is empty, it breaks. this is if two cluster centres are initialised identically.
         #work-around: make them share the points in their clusters
         # empty_keys = []
         # for i in range(len(keys_m)):

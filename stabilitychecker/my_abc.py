@@ -17,7 +17,7 @@ import cudasim.EulerMaruyama as EulerMaruyama
 import cudasim.Gillespie as Gillespie
 
 
-logging.basicConfig(filename='stabilCheck.log', level=logging.INFO)
+logging.basicConfig(filename='stabilCheck.log', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -108,18 +108,12 @@ def central():
         pop_fold_res_path = 'Population_'+str(pop_indic+1)
         os.makedirs(str(results_path)+'/'+str(pop_fold_res_path))
         previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, alpha, accepted_distances)
-        # if epsilons[0] < epsilons_final[0]:
-        #     logger.debug('Number of clusters e was: %s', epsilons[0])
-        #     epsilons[0] = epsilons_final[0]
-        #     logger.debug('and now set back up to: %s', epsilons[0])
-        # if epsilons[1] < epsilons_final[1]:
-        #     logger.debug('Total variance e was: %s', epsilons[1])
-        #     epsilons[1] = epsilons_final[1]
-        #     logger.debug('and now set back up to: %s', epsilons[1])
-        # if epsilons[2] < epsilons_final[2]:
-        #     logger.debug('Cluster variance e was: %s', epsilons[2])
-        #     epsilons[2] = epsilons_final[2]
-        #     logger.debug('and now set back up to: %s', epsilons[2])
+        if epsilons[0] < epsilons_final[0]:
+             epsilons[0] = epsilons_final[0]
+        if epsilons[1] < epsilons_final[1]:
+             epsilons[1] = epsilons_final[1]
+        if epsilons[2] < epsilons_final[2]:
+             epsilons[2] = epsilons_final[2]
         parameters_accepted = []
         accepted_distances = []
 
@@ -287,6 +281,7 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
 
     logger.debug('Distance module called')
     distances_matrix = []
+    tmp = []
     if stoch_determ == 'deterministic':
         logger.info(' Distance (deterministic)...')
     elif stoch_determ == 'stochastic':
@@ -299,18 +294,25 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         set_result1 = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1]
         set_result2 = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[1])-1]
         set_result = zip(set_result1, set_result2)
-        ss_res_set1 = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1]
-        ss_res_set2 = cudasim_result[range_start:range_end, 0, -10:,int(species_numb_to_fit[1])-1]
-        ss_res_set = zip(ss_res_set1, ss_res_set2)
+
+        #ss_res_set1 = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1]
+        #ss_res_set2 = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[1])-1]
+        #ss_res_set = zip(*ss_res_set1, *ss_res_set2)
+        #print ss_res_set
+        ss_res_set = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1:int(species_numb_to_fit[1])]
+        #logger.debug('steady state data: %s', ss_res_set)
         std_devs = steady_state_check.ss_check(ss_res_set)
+        #logger.debug('ss check output: %s', std_devs)
         if stoch_determ == 'deterministic':
             #logger.debug('set_result: %s', set_result )
             cluster_counter, clusters_means, total_variance, median_clust_var = deterministic_clustering.distance(set_result)
         elif stoch_determ == 'stochastic':
             #set_resprint set_result
             cluster_counter, clusters_means, total_variance, median_clust_var = gap_statistic.distance(set_result)
-        distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2]), std_devs[0], std_devs[1]])
+        #tmp.append([cluster_counter, total_variance, median_clust_var])
+        distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2]), std_devs[0], std_devs[1], clusters_means])
     logger.info('Distance finished')
+    #logger.debug('distance data: %s', tmp)
     logger.debug('Distance matrix: %s', distances_matrix)
     return distances_matrix
 
@@ -320,26 +322,36 @@ def accept_reject_params(distances_matrix, parameters_sampled, epsilons):
     #Reject the priors>e.
     index_to_delete = []
     #new_list = sorted(distances_matrix, key=itemgetter(0))
-    #logger.debug('distances matrix: %s', distances_matrix)
     for index, item in enumerate(distances_matrix):
         #epsilon_cl_current is the distance of current alpha to desired behaviour!
         #item!=item is a check in case the value is nan
         if item[0] > epsilons[0] or item[0] != item[0]:
-            logger.debug('cluster counter failed')
+            #logger.debug('cluster counter failed')
             index_to_delete.append(index)
 
         if item[1] > epsilons[1] or item[1] != item[1]:
             index_to_delete.append(index)
-            logger.debug('total variance failed')
+            #logger.debug('total variance failed')
 
         if item[2] > epsilons[2] or item[2] != item[2]:
             index_to_delete.append(index)
-            logger.debug('cluster variance failed')
+            #logger.debug('cluster variance failed')
 
         if item[3] > 0.000001 or item[4] > 0.000001:
-            logger.debug('steady state check failed')
+            #logger.debug('steady state check failed')
             index_to_delete.append(index)
 
+        if len(item[5]) >= 2:
+            counter = 0
+            for it in item[5]:
+                if it[0] > 10 or it[1] > 10:
+                    counter += 1
+            if counter < 2:
+                logger.debug('steady state level failed')
+                index_to_delete.append(index)
+            else:
+                logger.debug('steady state level success')
+                logger.debug('because of: %s', item[5])
     #get the unique values by converting the list to a set
     index_to_delete = set(index_to_delete)
     index_to_delete_l = list(index_to_delete)
