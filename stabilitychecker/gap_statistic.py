@@ -10,9 +10,9 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 #import scipy
-import logging
-logging.basicConfig(filename='stabilCheck.log', level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+#import logging
+#logging.basicConfig(filename='stabilCheck.log', level=logging.DEBUG)
+#logger = logging.getLogger(__name__)
 
 def Wk(clusters_centroids, clusters):
    #k is the number of clusters
@@ -57,7 +57,7 @@ def gap_statistic(X):
                 clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(X, k)
 
             except: # catch all exceptions
-                logger.debug('Failed at k: %s ', k)
+                #logger.debug('Failed at k: %s ', k)
                 continue
             clusters_centroids_tmp.append(clusters_centroids)
             clusters_tmp.append(clusters)
@@ -124,7 +124,7 @@ def distance(data):
             cluster_counter = 1
             break
         if gaps[i] >= (gaps[i+1]-sk[i+1]):
-            logger.debug('optimum number of clusters is: %s', cluster_counter)
+            #logger.debug('optimum number of clusters is: %s', cluster_counter)
             break
     return cluster_counter, clusters_means[cluster_counter-1], total_variances[cluster_counter-1],  median_cluster_variances[cluster_counter-1]
 
