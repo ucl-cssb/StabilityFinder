@@ -8,11 +8,7 @@ J.R. Statist Soc B, 63, 411-423
 import k_means_clustering
 import numpy as np
 import random
-import matplotlib.pyplot as plt
-#import scipy
-#import logging
-#logging.basicConfig(filename='stabilCheck.log', level=logging.DEBUG)
-#logger = logging.getLogger(__name__)
+
 
 def Wk(clusters_centroids, clusters):
    #k is the number of clusters
@@ -124,7 +120,6 @@ def distance(data):
             cluster_counter = 1
             break
         if gaps[i] >= (gaps[i+1]-sk[i+1]):
-            #logger.debug('optimum number of clusters is: %s', cluster_counter)
             break
     return cluster_counter, clusters_means[cluster_counter-1], total_variances[cluster_counter-1],  median_cluster_variances[cluster_counter-1]
 
