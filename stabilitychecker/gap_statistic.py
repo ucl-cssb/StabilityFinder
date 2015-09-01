@@ -90,7 +90,6 @@ def gap_statistic(X):
     return ks, Wks, Wkbs, sk, data_centrs, clusts, total_variances, median_cluster_variances
 
 def distance(data):
-
     #Jitter is added to the data because when you have integers as data they overlap and the clusters fail.
     # if centres are chosen as points with the same coordinates, all the surrounding points will be assigned to only one of them and one centre will remain empty
     def rand_jitter(arr):
@@ -139,5 +138,5 @@ if __name__ == "__main__":
     distance(data)
 
     x, y = zip(*data)
-    plt.scatter(x, y)
-    plt.show()
+    #plt.scatter(x, y)
+    #plt.show()

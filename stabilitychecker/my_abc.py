@@ -47,7 +47,8 @@ def central():
     parameters_accepted = []
     accepted_distances = []
     epsilons_final = [float(read_input.epsilon_cl[1]), float(read_input.epsilons_t[1]), float(read_input.epsilons_vcl[1])]
-
+    ss_std = float(read_input.steady_state_std)
+    cluster_mean_min = float(read_input.cluster_mean)
     final_number_clusters = float(read_input.number_of_clusters[1])
     final_total_variance = float(read_input.total_variance[1])
     final_cluster_variance = float(read_input.cluster_variance[1])
@@ -67,7 +68,7 @@ def central():
                 write_cuda(stoch_determ, sbml_name)
             cudasim_result = simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample,stoch_determ)
             distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ)
-            parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, parameters_sampled, epsilons)
+            parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, parameters_sampled, epsilons, ss_std, cluster_mean_min)
             for i in parameters_sampled:
                 parameters_accepted.append(i)
             for i in distances_matrix:
@@ -103,22 +104,21 @@ def central():
 
         previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, alpha, accepted_distances)
         #If you havent finihed but any of your epsilons falls below the final epsilon value put it back up to the final epsilon value
-        if epsilons[0] < epsilons_final[0]:
-            epsilons[0] = epsilons_final[0]
-        if epsilons[1] < epsilons_final[1]:
-            epsilons[1] = epsilons_final[1]
-        if epsilons[2] < epsilons_final[2]:
-            epsilons[2] = epsilons_final[2]
+        #if epsilons[0] < epsilons_final[0]:
+        #    epsilons[0] = epsilons_final[0]
+        #if epsilons[1] < epsilons_final[1]:
+        #    epsilons[1] = epsilons_final[1]
+        #if epsilons[2] < epsilons_final[2]:
+        #    epsilons[2] = epsilons_final[2]
         parameters_accepted = []
         accepted_distances = []
 
         while finished == 'false':
-            logger.debug('weights prev: %s', previous_weights_list)
             parameters_sampled, current_sampled_weights = sample_params(previous_parameters, previous_weights_list, number_to_sample)
             perturbed_particles = perturb_particles(parameters_sampled)
             cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample,stoch_determ)
             distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ)
-            parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, perturbed_particles, epsilons)
+            parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, perturbed_particles, epsilons, ss_std, cluster_mean_min)
             # Append the accepted ones to a matrix which will be built up until you reach the number of particles you want
             for i in parameters_sampled:
                 parameters_accepted.append(i)
@@ -190,7 +190,6 @@ def sample_priors(number_to_sample):
 def sample_params(parameters_accepted, current_weights_list, number_to_sample):
     logger.info('sampling particles from previous population')
     logger.debug('params accepted: %s', len(parameters_accepted))
-    logger.debug('current_weights_list: %s', len(current_weights_list))
     def choose_sample(current_weights_list):
         #Bernouli trials
         #Choose a random number between 0 and 1
@@ -267,7 +266,6 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, 
     return result
 
 def measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ):
-
     logger.debug('Distance module called')
     distances_matrix = []
     if stoch_determ == 'deterministic':
@@ -289,11 +287,11 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
             cluster_counter, clusters_means, total_variance, median_clust_var = gap_statistic.distance(set_result)
         distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2]), std_devs[0], std_devs[1], clusters_means])
     logger.info('Distance finished')
-    logger.debug('Distance matrix: %s', distances_matrix)
+    #logger.debug('Distance matrix: %s', distances_matrix)
     return distances_matrix
 
 
-def accept_reject_params(distances_matrix, parameters_sampled, epsilons):
+def accept_reject_params(distances_matrix, parameters_sampled, epsilons, ss_std, cluster_mean_min):
     logger.info('Accepting or rejecting particles')
     #Reject the paramss>e.
     index_to_delete = []
@@ -307,22 +305,29 @@ def accept_reject_params(distances_matrix, parameters_sampled, epsilons):
 
         if item[1] > epsilons[1] or item[1] != item[1]:
             index_to_delete.append(index)
-            #logger.debug('total variance failed')
+            logger.debug('total variance failed')
 
         if item[2] > epsilons[2] or item[2] != item[2]:
             index_to_delete.append(index)
-            #logger.debug('cluster variance failed')
+            logger.debug('cluster variance failed')
 
-        if item[3] > 0.000001 or item[4] > 0.000001:
-            #logger.debug('steady state check failed')
+        if item[3] > ss_std or item[4] > ss_std:
+            logger.debug('steady state check failed')
             index_to_delete.append(index)
 
         if len(item[5]) >= 2:
             counter = 0
-            for it in item[5]:
-                if it[0] > 10 or it[1] > 10:
-                    counter += 1
-            if counter < 2:
+            #In the deterministic case it is a dictionary
+            if isinstance(item[5], dict):
+                for it in item[5].values():
+                    if it[0] > cluster_mean_min or it[1] > cluster_mean_min:
+                        counter += 1
+            #In the stochastic case it is a list
+            else:
+                for it in item[5]:
+                    if it[0] > cluster_mean_min or it[1] > cluster_mean_min:
+                        counter += 1
+            if counter <= 1:
                 logger.debug('steady state level failed')
                 index_to_delete.append(index)
     #get the unique values by converting the list to a set

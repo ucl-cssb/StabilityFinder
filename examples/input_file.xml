@@ -15,6 +15,11 @@
         <end>0.1</end>
     </eps_cl>
 
+    <steady_state>
+        <standard_dev>0.001</standard_dev>
+        <cluster_mean>0</cluster_mean>
+    </steady_state>
+
     #Desired behaviour
     <number_of_clusters>
         <start>10</start>
