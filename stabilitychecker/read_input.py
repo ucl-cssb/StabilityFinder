@@ -2,6 +2,7 @@ from xml.etree import ElementTree
 
 def inp(filename):
 
+
     document = ElementTree.parse(filename)
 
     epsilon_t = document.find('epsilon_t')

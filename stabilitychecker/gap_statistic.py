@@ -141,5 +141,5 @@ if __name__ == "__main__":
     distance(data)
 
     x, y = zip(*data)
-    plt.scatter(x, y)
-    plt.show()
+    #plt.scatter(x, y)
+    #plt.show()

@@ -74,6 +74,7 @@ def central():
         distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff)
         parameters_accepted = parameters_sampled[0:int(number_particles)]
         accepted_distances = distances_matrix[0:int(number_particles)]
+
         pop_fold_res_path = 'Population_'+str(pop_indic+1)
         os.makedirs(results_path+'/'+pop_fold_res_path)
         current_weights_list = particle_weights(parameters_accepted, current_weights_list)
@@ -86,6 +87,7 @@ def central():
         pop_fold_res_path = 'Population_'+str(pop_indic+1)
         os.makedirs(results_path+'/'+pop_fold_res_path)
         previous_parameters, previous_weights_list, epsilons = prepare_next_pop(parameters_accepted, current_weights_list, alpha, accepted_distances)
+
         parameters_accepted = []
         accepted_distances = []
 
@@ -94,6 +96,7 @@ def central():
             perturbed_particles = perturb_particles(parameters_sampled, lims)
             cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample,stoch_determ, modelInstance, ics)
             distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff)
+
             parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, perturbed_particles, epsilons, ss_std, cluster_mean_min)
             # Append the accepted ones to a matrix which will be built up until you reach the number of particles you want
             for i in parameters_sampled:
@@ -161,6 +164,7 @@ def sample_priors(number_to_sample, lims):
 
 
 def sample_params(parameters_accepted, current_weights_list, number_to_sample):
+
     def choose_sample(current_weights_list):
         #Bernouli trials
         #Choose a random number between 0 and 1
@@ -234,6 +238,7 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         for j in range(len(ss_res_set1)):
             ss_res_set.append(zip(ss_res_set1[j], ss_res_set2[j]))
         std_devs = steady_state_check.ss_check(ss_res_set)
+
         if stoch_determ == 'ODE':
             cluster_counter, clusters_means, total_variance, median_clust_var = deterministic_clustering.distance(set_result, det_clust_delta)
             meas_dis.append([cluster_counter, total_variance, median_clust_var, std_devs[0], std_devs[1], clusters_means.values()])
@@ -251,7 +256,6 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
     logger.info('steady state standard deviation min/max, species2: %s', [min(xyz[4]), max(xyz[4])])
     logger.info('cluster mean level min/max: %s', [(min(a), max(a)) for a in zip(*xyz[5])])
     return distances_matrix
-
 
 def accept_reject_params(distances_matrix, parameters_sampled, epsilons, ss_std, cluster_mean_min):
     #Reject the paramss>e.
@@ -285,6 +289,7 @@ def accept_reject_params(distances_matrix, parameters_sampled, epsilons, ss_std,
         for index in reversed(sorted_index_delete):
             del distances_matrix[index]
             del parameters_sampled[index]
+
     return parameters_sampled, distances_matrix
 
 
