@@ -17,14 +17,14 @@ import cudasim.EulerMaruyama as EulerMaruyama
 import cudasim.Gillespie as Gillespie
 import sys, getopt
 
-logging.basicConfig(filename='stabilCheck.log', level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 
 def central():
     start = time.time()
-    opts, args = getopt.getopt(sys.argv[1:], "hi:o:", ["ifile=", "ofile="])
+    opts, args = getopt.getopt(sys.argv[1:], "hi:o:l:", ["ifile=", "ofile=", "lfile="])
     for opt, arg in opts:
+        if opt in ("-l", "--lfile"):
+            logging.basicConfig(filename=arg, level=logging.INFO)
+
         if opt in ("-i", "--ifile"):
             epsilons_final, final_desired_values, ss_std, cluster_mean_min, number_particles,\
             number_to_sample, init_cond_to_sample, alpha, times, species_numb_to_fit, stoch_determ, \
@@ -34,10 +34,8 @@ def central():
             if not os.path.exists(arg):
                 os.makedirs(arg)
                 results_path = arg
-                logger.info('Made results directory: %s', arg)
-            else:
-                logger.info('Results directory already existed')
 
+    logger.info('==============================================')
     logger.info('INPUTS')
     logger.info('epsilons: %s', epsilons_final)
     logger.info('particles: %s', number_particles)
@@ -67,6 +65,7 @@ def central():
         import cudasim.Gillespie as Gillespie
         modelInstance = Gillespie.Gillespie(times, cudaCode, dt=dt)
     if pop_indic == 0:
+        logger.info('==============================================')
         logger.info('RUN')
         logger.info('population: %s', pop_indic+1)
         parameters_sampled = sample_priors(number_to_sample, lims)
@@ -83,6 +82,7 @@ def central():
 
     while finishTotal == False:
         finished = False
+        logger.info('==============================================')
         logger.info('population: %s', pop_indic+1)
         pop_fold_res_path = 'Population_'+str(pop_indic+1)
         os.makedirs(results_path+'/'+pop_fold_res_path)
@@ -132,7 +132,6 @@ def central():
 
 
 def prepare_next_pop(parameters_accepted, current_weights_list, alpha, distances_matrix):
-    logger.info('Preparing next population')
     distances_matrix.sort(key=operator.itemgetter(0, 1, 2))
     epsilon_cl_current = distances_matrix[int(alpha)][0]
     epsilon_t_current = distances_matrix[int(alpha)][1]
@@ -248,7 +247,7 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
             meas_dis.append([cluster_counter, total_variance, median_clust_var, std_devs[0], std_devs[1], clusters_means])
             distances_matrix.append([abs(cluster_counter - final_desired_values[0]), abs(total_variance - final_desired_values[1]), abs(median_clust_var - final_desired_values[2]), std_devs[0], std_devs[1], clusters_means])
     xyz = zip(*meas_dis)
-    logger.info('Distances: ')
+    logger.info('----------Distances---------- ')
     logger.info('number of clusters min/max: %s', [min(xyz[0]), max(xyz[0])])
     logger.info('total variance min/max: %s', [min(xyz[1]), max(xyz[1])])
     logger.info('cluster variance min/max: %s', [min(xyz[2]), max(xyz[2])])
@@ -259,21 +258,32 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
 
 def accept_reject_params(distances_matrix, parameters_sampled, epsilons, ss_std, cluster_mean_min):
     #Reject the paramss>e.
+    fail_counter_0 = 0
+    fail_counter_1 = 0
+    fail_counter_2 = 0
+    fail_counter_3 = 0
+    fail_counter_4 = 0
+
     index_to_delete = []
     for index, item in enumerate(distances_matrix):
         #epsilon_cl_current is the distance of current alpha to desired behaviour!
         #item!=item is a check in case the value is nan
         if item[0] > epsilons[0] or item[0] != item[0]:
             index_to_delete.append(index)
+            fail_counter_0 += 1
 
         if item[1] > epsilons[1] or item[1] != item[1]:
             index_to_delete.append(index)
+            fail_counter_1 += 1
 
         if item[2] > epsilons[2] or item[2] != item[2]:
             index_to_delete.append(index)
+            fail_counter_2 += 1
 
         if item[3] > ss_std or item[4] > ss_std:
             index_to_delete.append(index)
+            fail_counter_3 += 1
+
         if len(item[5]) >= 2:
             counter = 0
             for it in item[5]:
@@ -281,6 +291,8 @@ def accept_reject_params(distances_matrix, parameters_sampled, epsilons, ss_std,
                     counter += 1
             if counter < 2:
                 index_to_delete.append(index)
+                fail_counter_4 += 1
+
     #get the unique values by converting the list to a set
     index_to_delete = set(index_to_delete)
     index_to_delete_l = list(index_to_delete)
@@ -289,7 +301,12 @@ def accept_reject_params(distances_matrix, parameters_sampled, epsilons, ss_std,
         for index in reversed(sorted_index_delete):
             del distances_matrix[index]
             del parameters_sampled[index]
-
+    logger.info('----------Fails----------')
+    logger.info('number of clusters: %s', fail_counter_0)
+    logger.info('total variance: %s', fail_counter_1)
+    logger.info('cluster variance: %s', fail_counter_2)
+    logger.info('steady state standard deviation: %s', fail_counter_3)
+    logger.info('steady state level: %s', fail_counter_4)
     return parameters_sampled, distances_matrix
 
 
@@ -403,6 +420,7 @@ def perturbed_particle_weights(parameters_accepted, previous_parameters, lims):
         current_weights_list[i] = float(current_weights_list[i])/float(n)
     return current_weights_list
 
+logger = logging.getLogger(__name__)
 final_weights, final_particles, final_timecourses1, final_timecourses2, pop_fold_res_path, results_path = central()
 final_path_v = str(results_path)+'/Parameter_values_final.txt'
 final_path_w = str(results_path)+'/Parameter_weights_final.txt'
