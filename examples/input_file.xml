@@ -1,33 +1,32 @@
 <data>
 
     <epsilon_t>
-        <start>200</start>
-        <end>0.5</end>
+        <end>10</end>
     </epsilon_t>
 
     <epsilon_vcl>
-        <start>200</start>
-        <end>1</end>
+        <end>10</end>
     </epsilon_vcl>
 
     <eps_cl>
-        <start>10</start>
         <end>0.1</end>
     </eps_cl>
 
+    <steady_state>
+        <standard_dev>0.001</standard_dev>
+        <cluster_mean>0.0</cluster_mean>
+    </steady_state>
+
     #Desired behaviour
     <number_of_clusters>
-        <start>10</start>
         <end>2</end>
     </number_of_clusters>
 
     <total_variance>
-         <start>10</start>
         <end>1</end>
     </total_variance>
 
     <cluster_variance>
-        <start>100</start>
         <end>1</end>
     </cluster_variance>
 
@@ -38,11 +37,13 @@
     <initial_conditions_samples>100</initial_conditions_samples>
 
     <alpha>0.1</alpha>
-
+    <dt>-1</dt>
+    <det_clust_delta>0.0001</det_clust_delta>
+    <kmeans_cutoff>0.00001</kmeans_cutoff>
     <times>0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100</times>
     <species_numb_to_fit>1 2</species_numb_to_fit>
     #deterministic or stochastic
-    <stoch_determ>deterministic</stoch_determ>
+    <stoch_determ>ODE</stoch_determ>
     #sbml or cuda
     <model_file>cuda</model_file>
     <sbml_name>model</sbml_name>
@@ -56,6 +57,7 @@
 
         <item>
             <name>a1</name>
+            #uniform or lognormal. If lognormal start = mu, end = sigma.
             <distribution>uniform</distribution>
             <start>0</start>
             <end>10</end>
@@ -65,7 +67,7 @@
             <name>beta</name>
             <distribution>uniform</distribution>
             <start>0</start>
-            <end>10</end>
+            <end>5</end>
         </item>
 
         <item>
@@ -79,7 +81,7 @@
             <name>gamma</name>
             <distribution>uniform</distribution>
             <start>0</start>
-            <end>10</end>
+            <end>5</end>
         </item>
     </parameters>
 
@@ -88,14 +90,14 @@
             <name>ic1 </name>
             <distribution>uniform</distribution>
             <start>0</start>
-            <end>10</end>
+            <end>100</end>
         </item>
 
         <item>
             <name>ic2</name>
             <distribution>uniform</distribution>
             <start>0</start>
-            <end>10</end>
+            <end>100</end>
         </item>
         
     </initial_conditions>

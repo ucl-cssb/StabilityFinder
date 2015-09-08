@@ -3,13 +3,13 @@ from numpy import *
 import read_input
 
 
-def sample_init(number_to_sample, init_cond_to_sample):
+def sample_init(number_to_sample, init_cond_to_sample, ics):
 
     vals = []
     limits = []
     uniformIndex = []
     p = -1
-    for i in read_input.ics:
+    for i in ics:
         p += 1
         if i[0] == 'constant':
             vals.append(float(i[1]))
@@ -20,7 +20,7 @@ def sample_init(number_to_sample, init_cond_to_sample):
             limits.append(float(i[2]))
             uniformIndex.append(p)
 
-    init_codit_matrix = zeros([init_cond_to_sample, len(read_input.ics)])
+    init_codit_matrix = zeros([init_cond_to_sample, len(ics)])
     init_cond_total_matrix = []
     global_min_1 = limits[0]
     global_max_1 = limits[1]

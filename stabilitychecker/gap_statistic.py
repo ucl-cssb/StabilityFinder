@@ -30,7 +30,7 @@ def bounding_box(X):
     ymin, ymax = min(X,key=lambda a:a[1])[1], max(X, key=lambda a:a[1])[1]
     return (xmin, xmax), (ymin, ymax)
 
-def gap_statistic(X):
+def gap_statistic(X, kmeans_cutoff):
     (xmin, xmax), (ymin, ymax) = bounding_box(X)
     # Dispersion for real distribution
     ks = [1, 2, 3, 4]
@@ -50,7 +50,7 @@ def gap_statistic(X):
         #Test each k 3 times and take the median
         for i in range(3):
             try:
-                clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(X, k)
+                clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(X, k, kmeans_cutoff)
 
             except: # catch all exceptions
                 #logger.debug('Failed at k: %s ', k)
@@ -81,7 +81,7 @@ def gap_statistic(X):
                 Xb.append([random.uniform(xmin, xmax),
                           random.uniform(ymin, ymax)])
             Xb = np.array(Xb)
-            clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(Xb, k)
+            clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(Xb, k, kmeans_cutoff)
             BWkbs[i] = np.log(Wk(clusters_centroids, clusters))
         #Calculate Wk for each k in the reference data set
         Wkbs[indk] = sum(BWkbs)/B
@@ -89,13 +89,15 @@ def gap_statistic(X):
     sk = sk*np.sqrt(1+1/B)
     return ks, Wks, Wkbs, sk, data_centrs, clusts, total_variances, median_cluster_variances
 
-def distance(data):
+def distance(data, kmeans_cutoff):
 
     #Jitter is added to the data because when you have integers as data they overlap and the clusters fail.
     # if centres are chosen as points with the same coordinates, all the surrounding points will be assigned to only one of them and one centre will remain empty
     def rand_jitter(arr):
         stdev = .01*(max(arr)-min(arr))
         mu = np.mean(arr)
+        if stdev == 0.0 and mu == 0.0:
+            stdev = 0.000000001
         arr_j = []
         for j in arr:
             t = j + np.random.normal(mu, stdev)
@@ -107,7 +109,7 @@ def distance(data):
     data_y_j = rand_jitter(data_y)
     data = zip(data_x_j, data_y_j)
 
-    ks, logWks, logWkbs, sk, clusters_means, clusts, total_variances, median_cluster_variances = gap_statistic(data)
+    ks, logWks, logWkbs, sk, clusters_means, clusts, total_variances, median_cluster_variances = gap_statistic(data, kmeans_cutoff)
     gaps = []
     for i in range(len(ks)):
         gaps.append(logWkbs[i]-logWks[i])

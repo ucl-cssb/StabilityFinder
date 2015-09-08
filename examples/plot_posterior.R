@@ -18,7 +18,7 @@ plot_posterior_distr <- function(limits, param_names, p_values_final){
       if(i==j){
       print(a[i])
       print(b[i])
-        pltList[[k]] <-ggplot(p_values_final, aes_string(x=param_names[i], weight=param_names[ncol(p_values_final)])) + geom_density(fill="grey") + xlim(a[i],b[i])+ ggtitle(param_names[i]) +
+        pltList[[k]] <-ggplot(p_values_final, aes_string(x=param_names[i], weight=param_names[ncol(p_values_final)])) + geom_density(fill="grey", adjust=1.5/2) + xlim(a[i],b[i])+ ggtitle(param_names[i]) +
           theme(axis.line=element_blank(),
                 plot.title=element_text(size=8, hjust=0,lineheight=0),
                 axis.text.x=element_text(size=6,angle = 90, vjust=0,hjust=1.2),
@@ -33,7 +33,7 @@ plot_posterior_distr <- function(limits, param_names, p_values_final){
       }else{
         pltList[[k]] <-ggplot(p_values_final, aes_string(x = param_names[i], y = param_names[j], weight=param_names[ncol(p_values_final)])) + xlim(a[i],b[i])+ ylim(a[j],b[j])+
           stat_density2d(aes(alpha=..level.., fill=..level.., weight=weights),
-                         size=2, bins=10, geom="polygon") +
+                         size=2, bins=50, geom="polygon") +
           scale_fill_gradient(low = "yellow", high = "red") +
           scale_alpha(range = c(0.00, 0.5), guide = FALSE) +
           geom_density2d(colour="black", bins=10)+

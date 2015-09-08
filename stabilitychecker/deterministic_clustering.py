@@ -1,11 +1,11 @@
 import numpy as np
-def distance(data):
+def distance(data, det_clust_delta):
    
     clusters_means = {}
     clusters_data = {}
     clusters_variance = {}
     cluster_counter = 0
-    delta = 0.0001
+    delta = det_clust_delta
     line_counter = 0
 
     """

@@ -9,7 +9,7 @@ import sys
 import matplotlib.pyplot as plt
 
 
-def kmeans(data, number_centroids):
+def kmeans(data, number_centroids, kmeans_cutoff):
 
     def update_centroids(old_centroid, values):
         numPoints = float(len(values))
@@ -33,7 +33,7 @@ def kmeans(data, number_centroids):
         var = np.var(cluster)
         return var
 
-    cutoff = 0.00001
+    cutoff = kmeans_cutoff
     clusters_centroids = {}
     clusters_variance = {}
     clusters = {}
