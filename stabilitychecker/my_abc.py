@@ -28,7 +28,7 @@ def central():
         if opt in ("-i", "--ifile"):
             epsilons_final, final_desired_values, ss_std, cluster_mean_min, number_particles,\
             number_to_sample, init_cond_to_sample, alpha, times, species_numb_to_fit, stoch_determ, \
-            model_file, sbml_name, lims, ics, dt, det_clust_delta, kmeans_cutoff = read_input.inp(arg)
+            model_file, sbml_name, lims, ics, dt, det_clust_delta, kmeans_cutoff, cell_volume_first_param = read_input.inp(arg)
 
         if opt in ("-o", "--ofile"):
             if not os.path.exists(arg):
@@ -44,7 +44,8 @@ def central():
     logger.info('integration: %s', stoch_determ)
     logger.info('priors: %s', lims)
     logger.info('initial conditions: %s', ics)
-
+    logger.info('results folder: %s', results_path)
+    logger.info('First parameter ignored: %s', cell_volume_first_param)
     alpha = math.ceil(alpha*number_particles)
     pop_indic = 0
     finishTotal = False
@@ -93,7 +94,7 @@ def central():
 
         while finished == False:
             parameters_sampled, current_sampled_weights = sample_params(previous_parameters, previous_weights_list, number_to_sample)
-            perturbed_particles = perturb_particles(parameters_sampled, lims)
+            perturbed_particles = perturb_particles(parameters_sampled, lims, cell_volume_first_param)
             cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample,stoch_determ, modelInstance, ics)
             distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff)
 
@@ -148,9 +149,8 @@ def sample_priors(number_to_sample, lims):
     while partic_indic <= number_to_sample:
         params = []
         for i in lims:
-            if i[0] == 'constant':
-                params.append(1.0)
-            else:
+                if i[0] == 'constant':
+                    params.append(float(i[1]))
                 if i[0] == 'uniform':
                     params.append(random.uniform(low=i[1], high=i[2]))
                 if i[0] == 'lognormal':
@@ -237,7 +237,6 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         for j in range(len(ss_res_set1)):
             ss_res_set.append(zip(ss_res_set1[j], ss_res_set2[j]))
         std_devs = steady_state_check.ss_check(ss_res_set)
-
         if stoch_determ == 'ODE':
             cluster_counter, clusters_means, total_variance, median_clust_var = deterministic_clustering.distance(set_result, det_clust_delta)
             meas_dis.append([cluster_counter, total_variance, median_clust_var, std_devs[0], std_devs[1], clusters_means.values()])
@@ -341,18 +340,17 @@ def particle_weights(parameters_sampled, weights_list):
     return weights_list
 
 
-def perturb_particles(parameters_sampled, lims):
+def perturb_particles(parameters_sampled, lims, cell_volume_first_param):
     logger.info('Perturbing particles')
     ##Make a new list which will be used so that you don't confuse them with the sampled parameters
     not_perturbed_particles = copy.deepcopy(parameters_sampled)
     perturbed_particles = []
     for particle in not_perturbed_particles:
         part_params = []
-
         for i in range(0, len(particle)):
-            if i == 0:
+            if cell_volume_first_param == 'True' and i == 0:
                 part_params.append(1.0)
-            if i > 0:
+            else:
                 minimum = min(param[i] for param in parameters_sampled)
                 maximum = max(param[i] for param in parameters_sampled)
                 scale = (maximum-minimum)/2
@@ -369,7 +367,6 @@ def perturb_particles(parameters_sampled, lims):
                     delta_perturb = random.uniform(low=float(lims[i][1])-particle[i], high=scale)
                     part_params.append(particle[i] + delta_perturb)
                     i += 1
-
             if i == len(particle):
                 perturbed_particles.append(part_params)
     return perturbed_particles

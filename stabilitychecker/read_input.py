@@ -56,7 +56,8 @@ def inp(filename):
 
     lims = []
     ics = []
-
+    ignore_param = document.find('cell_volume_first_param')
+    cell_volume_first_param = ignore_param.text
     for item in document.find('parameters').getchildren():
         lims.append([item.find('distribution').text, item.find('start').text, item.find('end').text])
     for item in document.find('initial_conditions').getchildren():
@@ -64,4 +65,4 @@ def inp(filename):
 
     return epsilons_final, final_desired_values, steady_state_std, cluster_mean, number_particles,\
            number_to_sample, initial_conditions_samples, alpha, times, species_numb_to_fit_lst, stoch_determ, \
-           model_file, sbml_name, lims, ics, dt, det_clust_delta, kmeans_cutoff
+           model_file, sbml_name, lims, ics, dt, det_clust_delta, kmeans_cutoff, cell_volume_first_param

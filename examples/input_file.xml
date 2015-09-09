@@ -13,7 +13,7 @@
     </eps_cl>
 
     <steady_state>
-        <standard_dev>0.001</standard_dev>
+        <standard_dev>0.0001</standard_dev>
         <cluster_mean>0</cluster_mean>
     </steady_state>
 
@@ -47,6 +47,8 @@
     #sbml or cuda
     <model_file>cuda</model_file>
     <sbml_name>model</sbml_name>
+    <cell_volume_first_param>True</cell_volume_first_param>
+    #uniform or lognormal. If lognormal start = mu, end = sigma.
     <parameters>
         <item>
             <name>parameter1</name>
@@ -57,7 +59,6 @@
 
         <item>
             <name>a1</name>
-            #uniform or lognormal. If lognormal start = mu, end = sigma.
             <distribution>uniform</distribution>
             <start>0</start>
             <end>10</end>

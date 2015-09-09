@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 def kmeans(data, number_centroids, kmeans_cutoff):
 
     def update_centroids(old_centroid, values):
+        if len(values) < 1:
+            print 'update_centroids empty', values
         numPoints = float(len(values))
         # Reformat that so all x's are together, all y'z etc.
         unzipped = zip(*values)
@@ -33,18 +35,16 @@ def kmeans(data, number_centroids, kmeans_cutoff):
         var = np.var(cluster)
         return var
 
-    #cutoff = kmeans_cutoff
     clusters_centroids = {}
     clusters_variance = {}
     clusters = {}
     loopCounter = 0
     initial = random.sample(data, number_centroids)
     #this makes it break, due to a bad initial clustering centres
-    # initial = [[1.69160347, 1.55470384], [1.93198557, 1.58238697], [0.35464153, 1.38295475]]
+    #initial = [[1.69160347, 1.55470384], [1.93198557, 1.58238697], [0.35464153, 1.38295475]]
     for i in range(number_centroids):
         clusters['Cluster '+str(i+1)] = [initial[i]]
         clusters_centroids['Cluster '+str(i+1)] = initial[i]
-
     while True:
         loopCounter += 1
         # For every point in the dataset ...
@@ -57,9 +57,12 @@ def kmeans(data, number_centroids, kmeans_cutoff):
                 dist_comp.append(getDistance(p, clusters_centroids[keys_m[cl]]))
             ind = dist_comp.index(min(dist_comp))
             clusters[keys_m[ind]].append(p)
+
         biggest_shift = 0.0
         # As many times as there are clusters ...
         for j in range(1, number_centroids+1):
+            if len(clusters['Cluster '+str(j)])<1:
+                print 'failed here', number_centroids,  'Cluster '+str(j)
             shift, clusters_centroids['Cluster '+str(j)] = update_centroids(clusters_centroids['Cluster '+str(j)], clusters['Cluster '+str(j)])
             # Keep track of the largest move from all cluster centroid updates
             biggest_shift = max(biggest_shift, shift)
