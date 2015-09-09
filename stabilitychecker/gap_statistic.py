@@ -48,11 +48,12 @@ def gap_statistic(X, kmeans_cutoff):
         total_variance_tmp = []
         median_clust_var_tmp = []
         #Test each k 3 times and take the median
-        for i in range(3):
+        Xcounter = 0
+        while Xcounter < 3:
             try:
                 clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(X, k, kmeans_cutoff)
+                Xcounter += 1
             except: # catch all exceptions
-            #    #logger.debug('Failed at k: %s ', k)
                 continue
             clusters_centroids_tmp.append(clusters_centroids)
             clusters_tmp.append(clusters)
@@ -60,11 +61,7 @@ def gap_statistic(X, kmeans_cutoff):
             median_clust_var_tmp.append(median_clust_var)
             #calculate wk for eack k for the data
             tmp_Wks.append(np.log(Wk(clusters_centroids, clusters)))
-        if len(tmp_Wks) % 2 != 0:
-            Wks[indk] = np.median(np.array(tmp_Wks))
-        else:
-            mid = len(tmp_Wks)/2
-            Wks[indk] = tmp_Wks[mid]
+        Wks[indk] = np.median(np.array(tmp_Wks))
         idx = tmp_Wks.index(Wks[indk])
         total_variances.append(total_variance_tmp[idx])
         median_cluster_variances.append(median_clust_var_tmp[idx])
@@ -73,6 +70,7 @@ def gap_statistic(X, kmeans_cutoff):
 
         # Create B reference datasets
         B = 10
+        Bcounter = 0
         BWkbs = np.zeros(B)
         for i in range(B):
             Xb = []
@@ -80,10 +78,12 @@ def gap_statistic(X, kmeans_cutoff):
                 Xb.append([random.uniform(xmin, xmax),
                           random.uniform(ymin, ymax)])
             Xb = np.array(Xb)
-            try:
-                clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(Xb, k, kmeans_cutoff)
-            except:
-                continue
+            while Bcounter < 10:
+            	try:
+                	clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(Xb, k, kmeans_cutoff)
+                	Bcounter += 1
+            	except:
+                	continue
             BWkbs[i] = np.log(Wk(clusters_centroids, clusters))
         #Calculate Wk for each k in the reference data set
         Wkbs[indk] = sum(BWkbs)/B
@@ -92,7 +92,6 @@ def gap_statistic(X, kmeans_cutoff):
     return ks, Wks, Wkbs, sk, data_centrs, clusts, total_variances, median_cluster_variances
 
 def distance(data, kmeans_cutoff):
-
     #Jitter is added to the data because when you have integers as data they overlap and the clusters fail.
     # if centres are chosen as points with the same coordinates, all the surrounding points will be assigned to only one of them and one centre will remain empty
     def rand_jitter(arr):

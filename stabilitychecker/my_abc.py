@@ -65,6 +65,7 @@ def central():
     elif stoch_determ == 'Gillespie':
         import cudasim.Gillespie as Gillespie
         modelInstance = Gillespie.Gillespie(times, cudaCode, dt=dt)
+
     if pop_indic == 0:
         logger.info('==============================================')
         logger.info('RUN')
