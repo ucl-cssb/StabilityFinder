@@ -6,7 +6,7 @@ import math
 import numpy as np
 import logging
 import sys
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 
 def kmeans(data, number_centroids, kmeans_cutoff):
