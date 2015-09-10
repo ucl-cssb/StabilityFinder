@@ -72,14 +72,14 @@ def central():
         logger.info('population: %s', pop_indic+1)
         parameters_sampled = sample_priors(number_to_sample, lims)
         cudasim_result = simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, stoch_determ, modelInstance, ics)
-        distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff)
+        distances_matrix, set_results = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff)
         parameters_accepted = parameters_sampled[0:int(number_particles)]
         accepted_distances = distances_matrix[0:int(number_particles)]
 
         pop_fold_res_path = 'Population_'+str(pop_indic+1)
         os.makedirs(results_path+'/'+pop_fold_res_path)
         current_weights_list = particle_weights(parameters_accepted, current_weights_list)
-        save_results_files(cudasim_result, number_particles, init_cond_to_sample, species_numb_to_fit, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic)
+        save_results_files(set_results, number_particles, init_cond_to_sample, species_numb_to_fit, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic)
         pop_indic += 1
 
     while finishTotal == False:
@@ -92,22 +92,25 @@ def central():
 
         parameters_accepted = []
         accepted_distances = []
+        simulations_accepted = []
 
         while finished == False:
             parameters_sampled, current_sampled_weights = sample_params(previous_parameters, previous_weights_list, number_to_sample)
             perturbed_particles = perturb_particles(parameters_sampled, lims, cell_volume_first_param)
             cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample,stoch_determ, modelInstance, ics)
-            distances_matrix = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff)
-
-            parameters_sampled, distances_matrix = accept_reject_params(distances_matrix, perturbed_particles, epsilons, ss_std, cluster_mean_min)
+            distances_matrix, set_results = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff)
+            parameters_sampled, distances_matrix, passed_simulations = accept_reject_params(distances_matrix, perturbed_particles, epsilons, ss_std, cluster_mean_min, set_results, init_cond_to_sample)
             # Append the accepted ones to a matrix which will be built up until you reach the number of particles you want
             for i in parameters_sampled:
                 parameters_accepted.append(i)
             for i in distances_matrix:
                 accepted_distances.append(i)
+            for i in passed_simulations:
+                simulations_accepted.append(i)
             if len(parameters_accepted) >= number_particles:
                 parameters_accepted = parameters_accepted[0:int(number_particles)]
                 accepted_distances = accepted_distances[0:int(number_particles)]
+                simulations_accepted = simulations_accepted[0:int(number_particles)]
                 finished = True
                 logger.info('Reached number of particles')
             elif len(parameters_accepted) < float(number_particles):
@@ -117,20 +120,18 @@ def central():
             if finished == True:
                 break
         current_weights_list = perturbed_particle_weights(parameters_accepted, previous_parameters, lims)
-        save_results_files(cudasim_result, number_particles, init_cond_to_sample, species_numb_to_fit, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic)
+        save_results_files(simulations_accepted, number_particles, init_cond_to_sample, species_numb_to_fit, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic)
         pop_indic += 1
               
         if epsilons[0] <= epsilons_final[0] and epsilons[1] <= epsilons_final[1] and epsilons[2] <= epsilons_final[2]:
             finishTotal = True
             logger.info('Last population finished')
-            save_results_files(cudasim_result, number_particles, init_cond_to_sample, species_numb_to_fit, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic)
+            save_results_files(simulations_accepted, number_particles, init_cond_to_sample, species_numb_to_fit, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic)
             final_weights = current_weights_list[:]
             final_particles = parameters_accepted[:][:]
-            final_timecourse1 = cudasim_result[:, 0, :, int(species_numb_to_fit[0])-1]
-            final_timecourse2 = cudasim_result[:, 0, :, int(species_numb_to_fit[1])-1]
             end = time.time()
             logger.info('TIME: %s', end - start)
-    return final_weights, final_particles, final_timecourse1, final_timecourse2, pop_fold_res_path, results_path
+    return final_weights, final_particles, pop_fold_res_path, results_path
 
 
 def prepare_next_pop(parameters_accepted, current_weights_list, alpha, distances_matrix):
@@ -221,7 +222,7 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, 
     return result
 
 def measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff):
-
+    set_results = []
     logger.info('Measuring distance...')
     distances_matrix = []
     meas_dis = []
@@ -232,6 +233,7 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
         set_result1 = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1]
         set_result2 = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[1])-1]
         set_result = zip(set_result1, set_result2)
+        set_results.append(set_result)
         ss_res_set1 = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[0])-1]
         ss_res_set2 = cudasim_result[range_start:range_end, 0, -10:, int(species_numb_to_fit[1])-1]
         ss_res_set = []
@@ -254,24 +256,24 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
     logger.info('steady state standard deviation min/max, species1: %s', [min(xyz[3]), max(xyz[3])])
     logger.info('steady state standard deviation min/max, species2: %s', [min(xyz[4]), max(xyz[4])])
     logger.info('cluster mean level min/max: %s', [(min(a), max(a)) for a in zip(*xyz[5])])
-    return distances_matrix
+    return distances_matrix, set_results
 
-def accept_reject_params(distances_matrix, parameters_sampled, epsilons, ss_std, cluster_mean_min):
+def accept_reject_params(distances_matrix, parameters_sampled, epsilons, ss_std, cluster_mean_min, set_results, init_cond_to_sample):
+    passed_simulations = []
     #Reject the paramss>e.
     fail_counter_0 = 0
     fail_counter_1 = 0
     fail_counter_2 = 0
     fail_counter_3 = 0
     fail_counter_4 = 0
-
     index_to_delete = []
+    totlist = len(distances_matrix)
     for index, item in enumerate(distances_matrix):
-        #epsilon_cl_current is the distance of current alpha to desired behaviour!
+        #epsilon_cl_current is the distance of current alpha to desired behaviour
         #item!=item is a check in case the value is nan
         if item[0] > epsilons[0] or item[0] != item[0]:
             index_to_delete.append(index)
             fail_counter_0 += 1
-
         if item[1] > epsilons[1] or item[1] != item[1]:
             index_to_delete.append(index)
             fail_counter_1 += 1
@@ -301,28 +303,25 @@ def accept_reject_params(distances_matrix, parameters_sampled, epsilons, ss_std,
         for index in reversed(sorted_index_delete):
             del distances_matrix[index]
             del parameters_sampled[index]
+    for i in range(0, totlist):
+        if i not in sorted_index_delete:
+            passed_simulations.append(set_results[i])
     logger.info('----------Fails----------')
     logger.info('number of clusters: %s', fail_counter_0)
     logger.info('total variance: %s', fail_counter_1)
     logger.info('cluster variance: %s', fail_counter_2)
     logger.info('steady state standard deviation: %s', fail_counter_3)
     logger.info('steady state level: %s', fail_counter_4)
-    return parameters_sampled, distances_matrix
+    return parameters_sampled, distances_matrix, passed_simulations
 
 
-def save_results_files(cudasim_result, number_to_sample, init_cond_to_sample, species_numb_to_fit, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic ):
-    #[#threads][#beta][#timepoints][#speciesNumber]
+def save_results_files(simulations_accepted, number_to_sample, init_cond_to_sample, species_numb_to_fit, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic ):
     #Make the results population directory
-    #os.makedirs(results_path+'/'+pop_fold_res_path)
     numpy.savetxt(results_path+'/'+str(pop_fold_res_path)+'/data_Population'+str(pop_indic+1)+'.txt', parameters_accepted, delimiter=' ')
     numpy.savetxt(results_path+'/'+str(pop_fold_res_path)+'/data_Weights'+str(pop_indic+1)+'.txt', current_weights_list, delimiter=' ')
-    for i in range(0, int(number_to_sample)):
-        range_start = i*int(init_cond_to_sample)
-        range_end = i*int(init_cond_to_sample) + int(init_cond_to_sample)
-        set_result1 = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[0])-1]
-        set_result2 = cudasim_result[range_start:range_end, 0, -1, int(species_numb_to_fit[1])-1]
-        set_result = zip(set_result1, set_result2)
-        numpy.savetxt(str(results_path)+'/'+str(pop_fold_res_path)+'/set_result'+str(i)+'.txt', set_result, delimiter=' ')
+
+    for i in range(0, len(simulations_accepted)):
+        numpy.savetxt(str(results_path)+'/'+str(pop_fold_res_path)+'/set_result'+str(i)+'.txt', simulations_accepted[i], delimiter=' ')
     return
 
 
@@ -419,7 +418,7 @@ def perturbed_particle_weights(parameters_accepted, previous_parameters, lims):
     return current_weights_list
 
 logger = logging.getLogger(__name__)
-final_weights, final_particles, final_timecourses1, final_timecourses2, pop_fold_res_path, results_path = central()
+final_weights, final_particles, pop_fold_res_path, results_path = central()
 final_path_v = str(results_path)+'/Parameter_values_final.txt'
 final_path_w = str(results_path)+'/Parameter_weights_final.txt'
 numpy.savetxt(final_path_v, final_particles, delimiter=' ')
