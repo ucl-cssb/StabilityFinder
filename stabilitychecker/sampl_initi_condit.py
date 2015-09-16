@@ -34,7 +34,6 @@ def sample_init(number_to_sample, init_cond_to_sample, ics):
     i = 0
     while local_min_1 <= global_max_1:
 
-
         A2 = random.uniform(local_min_1, local_min_1 + len_segments)
         B2 = random.uniform(local_min_2, local_min_2 + len_segments)
 
@@ -50,7 +49,6 @@ def sample_init(number_to_sample, init_cond_to_sample, ics):
             local_min_1 = global_min_1
         if local_min_2 == global_max_2:
             break
-
     g = 0
     while g <= number_to_sample:
         j = 0
@@ -66,8 +64,13 @@ def sample_init(number_to_sample, init_cond_to_sample, ics):
                 break
         if g == number_to_sample:
             break
-
+    #print init_cond_total_matrix
     return init_cond_total_matrix
 
+
+
 if __name__ == "__main__":
-    sample_init(12, 100)
+    ics = [['uniform', '0', '500'], ['uniform', '0', '500']]
+    init =  sample_init(10, 9, ics)
+    for i in init:
+        print i
