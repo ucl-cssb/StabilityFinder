@@ -68,7 +68,7 @@ def central():
         logger.info('RUN')
         logger.info('population: %s', pop_indic+1)
         parameters_sampled = sample_priors(number_to_sample, lims)
-        cudasim_result = simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, stoch_determ, modelInstance, ics)
+        cudasim_result = simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, stoch_determ, modelInstance, ics, lims)
         distances_matrix, set_results = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff)
         parameters_accepted = parameters_sampled[0:int(number_particles)]
         accepted_distances = distances_matrix[0:int(number_particles)]
@@ -95,7 +95,7 @@ def central():
 
             parameters_sampled, current_sampled_weights = sample_params(previous_parameters, previous_weights_list, number_to_sample)
             perturbed_particles = perturb_particles(parameters_sampled, lims, cell_volume_first_param)
-            cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample,stoch_determ, modelInstance, ics)
+            cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample,stoch_determ, modelInstance, ics, lims)
             distances_matrix, set_results = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff)
             parameters_sampled, distances_matrix, set_results = accept_reject_params(distances_matrix, perturbed_particles, epsilons, ss_std, cluster_mean_min, set_results, init_cond_to_sample)
             # Append the accepted ones to a matrix which will be built up until you reach the number of particles you want
@@ -150,10 +150,10 @@ def sample_priors(number_to_sample, lims):
         for i in lims:
                 if i[0] == 'constant':
                     params.append(float(i[1]))
-                if i[0] == 'uniform':
+                if i[0] == 'uniform' or i[0] == 'log' :
                     params.append(random.uniform(low=i[1], high=i[2]))
-                if i[0] == 'lognormal':
-                    params.append(random.lognormal(mean=i[1], sigma=i[2]))
+                #if i[0] == 'lognormal':
+                #    params.append(random.lognormal(mean=i[1], sigma=i[2]))
         parameters_list.append(params)
         partic_indic += 1
         if partic_indic == number_to_sample:
@@ -207,11 +207,23 @@ def write_cuda(stoch_determ, sbml_name):
     return
 
 
-def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, stoch_determ, modelInstance, ics):
+def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, stoch_determ, modelInstance, ics, lims):
     logger.info('Simulating...')
-    #Here multiply the 'parameters' martix, to repeat each line 100 times, keeping the same order. this is so that the initial conditions and parameters matrices are equal.
+
+    #If one of the parameteres is log distribution, give the simulator 10^x rather than x. 
+    altered_param_list = []
+    for p in parameters_sampled:
+        p_count = -1
+        alt_tmp = []
+        for i in p:
+            p_count += 1
+            if lims[p_count][0] == 'log':
+                alt_tmp.append(10**i)
+            else:
+                alt_tmp.append(i)
+        altered_param_list.append(alt_tmp)
     expanded_params_list = []
-    for i in parameters_sampled:
+    for i in altered_param_list:
         for j in range(0, init_cond_to_sample):
             expanded_params_list.append(i)
     init_cond_list = sampl_initi_condit.sample_init(number_to_sample, init_cond_to_sample, ics)
@@ -223,11 +235,6 @@ def measure_distance(cudasim_result, number_to_sample, final_desired_values, ini
     logger.info('Measuring distance...')
     distances_matrix = []
     meas_dis = []
-
-    def most_common(lst):
-        index = lst.index((max(set(lst), key=lst.count)))
-        return index
-
 
     for i in range(0, int(number_to_sample)):
         range_start = i*int(init_cond_to_sample)
