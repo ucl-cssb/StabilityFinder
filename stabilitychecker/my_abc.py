@@ -126,6 +126,15 @@ def central():
             logger.info('Last population finished')
             final_weights = current_weights_list[:]
             final_particles = parameters_accepted[:][:]
+            logger.info('Re-sampling posterior')
+            #Sample from posterior
+            post_samp, post_weights = sample_params(final_particles, final_weights, number_to_sample)
+            cudasim_result = simulate_dataset(post_samp, number_to_sample, init_cond_to_sample, stoch_determ, modelInstance, ics, lims)
+            distances_matrix, set_results = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff)
+            pop_fold_res_path = '/re_sampled_posterior'
+            os.makedirs(results_path+'/re_sampled_posterior')
+            for i in range(0, len(set_results)):
+                numpy.savetxt(str(results_path)+'/re_sampled_posterior'+'/set_result'+str(i)+'.txt', set_results[i], delimiter=' ')
             end = time.time()
             logger.info('TIME: %s', end - start)
     return final_weights, final_particles, pop_fold_res_path, results_path
@@ -210,7 +219,7 @@ def write_cuda(stoch_determ, sbml_name):
 def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, stoch_determ, modelInstance, ics, lims):
     logger.info('Simulating...')
 
-    #If one of the parameteres is log distribution, give the simulator 10^x rather than x. 
+    #If one of the parameteres is log distribution, give the simulator 10^x rather than x.
     altered_param_list = []
     for p in parameters_sampled:
         p_count = -1
