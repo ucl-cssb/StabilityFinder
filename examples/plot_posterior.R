@@ -56,7 +56,7 @@ plot_posterior_distr <- function(limits, param_names, p_values_final){
    #ggsave(file="posterior.pdf",figure1)
    #n <- length(pltList)
    #nCol <- floor(sqrt(n))
-   pdf('posterior.pdf')
+   pdf('posterior_std.pdf')
    do.call("grid.arrange", pltList)
    dev.off()
    #g <- do.call("arrangeGrob", c(pltList, list(ncol=ncol(p_values_final)-1,main=textGrob("Model posterior", vjust=0.5, gp=gpar(fontsize=18, fontface="bold", fontsize=18)))))
@@ -69,8 +69,11 @@ plot_posterior_distr <- function(limits, param_names, p_values_final){
 #  dev.off()
 #}
 
-p_values_final = read.table("results_txt_files/Parameter_values_final.txt")
-p_weights_final = read.table("results_txt_files/Parameter_weights_final.txt")
+p_values_final = read.table("results_test2/Parameter_values_final.txt")
+p_weights_final = read.table("results_test2/Parameter_weights_final.txt")
+
+#p_values_final = read.table("results_tst/Parameter_values_final.txt")
+#p_weights_final = read.table("results_tst/Parameter_weights_final.txt")
 p_values_final <- subset(p_values_final, select = -p_values_final[,1] )
 p_values_final$param_weights <- unlist(p_weights_final)
 

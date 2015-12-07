@@ -45,7 +45,7 @@ def gap_statistic(X, kmeans_cutoff):
     for indk, k in enumerate(ks):
         T_pass = False
         #Test each k 3 times
-        for i in range(3):
+        for i in range(10):
             try:
                 clusters_centroids, clusters, total_variance, median_clust_var = k_means_clustering.kmeans(X, k, kmeans_cutoff)
                 T_pass = True

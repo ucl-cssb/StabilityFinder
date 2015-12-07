@@ -43,12 +43,21 @@ def inp(filename):
     cf = document.find('kmeans_cutoff')
     kmeans_cutoff = float(cf.text)
 
-    t = document.find('times')
-    times = t.text.split()
+    ts = document.find('times_start')
+    te = document.find('times_end')
+    ttd = document.find('times_twidth')
+
+    st = float(ts.text)
+    end = float(te.text)
+    twidth = float(ttd.text)
+
     spec_numb_fit = document.find('species_numb_to_fit')
     species_numb_to_fit_lst = spec_numb_fit.text.split()
     stoch_det = document.find('stoch_determ')
     stoch_determ = stoch_det.text
+
+    clust  = document.find('clustering')
+    clustering = clust.text
     mod_file = document.find('model_file')
     model_file = mod_file.text
     mod = document.find('sbml_name')
@@ -64,5 +73,5 @@ def inp(filename):
         ics.append([item.find('distribution').text, item.find('start').text, item.find('end').text])
 
     return epsilons_final, final_desired_values, steady_state_std, cluster_mean, number_particles,\
-           number_to_sample, initial_conditions_samples, alpha, times, species_numb_to_fit_lst, stoch_determ, \
-           model_file, sbml_name, lims, ics, dt, det_clust_delta, kmeans_cutoff, cell_volume_first_param
+           number_to_sample, initial_conditions_samples, alpha, st, end, twidth, species_numb_to_fit_lst, stoch_determ, \
+           clustering, model_file, sbml_name, lims, ics, dt, det_clust_delta, kmeans_cutoff, cell_volume_first_param
