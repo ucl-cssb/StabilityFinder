@@ -1,0 +1,143 @@
+<data>
+
+    <epsilon_t>
+        <end>10000</end>
+    </epsilon_t>
+
+    <epsilon_vcl>
+        <end>10000</end>
+    </epsilon_vcl>
+
+    <eps_cl>
+        <end>0.0</end>
+    </eps_cl>
+
+    #Desired behaviour
+    <number_of_clusters>
+        <end>6</end>
+    </number_of_clusters>
+
+    <total_variance>
+        <end>1</end>
+    </total_variance>
+
+    <cluster_variance>
+        <end>1</end>
+    </cluster_variance>
+
+    <steady_state>
+		<standard_dev>0.001</standard_dev >
+		<cluster_mean>0</cluster_mean >
+    </steady_state>
+
+    <particles>10</particles>
+
+    <number_to_sample>100</number_to_sample>
+
+    <initial_conditions_samples>100</initial_conditions_samples>
+
+    <alpha>0.1</alpha>
+    <dt>-1</dt>
+    <det_clust_delta>1</det_clust_delta>
+    <kmeans_cutoff>0.00001</kmeans_cutoff>
+
+	<times_start>0</times_start>
+	<times_end>1000</times_end>
+	<times_twidth>1</times_twidth>
+	
+    <species_numb_to_fit>1 2</species_numb_to_fit>
+    #deterministic or stochastic
+    <cell_volume_first_param>False</cell_volume_first_param>
+    <stoch_determ>ODE</stoch_determ>
+    <clustering>det</clustering>
+    #sbml or cuda
+    <model_file>cuda</model_file>
+    <sbml_name>model-three-node</sbml_name>
+    <parameters>
+        <item>
+            <name>gx</name>
+            <distribution>uniform</distribution>
+            <start>3</start>
+            <end>5</end>
+        </item>
+
+        <item>
+            <name>kx</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>0.2</end>
+        </item>
+
+        <item>
+            <name>nxy</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>2</end>
+        </item>
+
+        <item>
+            <name>xxy</name>
+            <distribution>uniform</distribution>
+            <start>140</start>
+            <end>160</end>
+        </item>
+
+        <item>
+            <name>lxy</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>0.2</end>
+        </item>
+
+        <item>
+            <name>nxx</name>
+            <distribution>uniform</distribution>
+            <start>2</start>
+            <end>4</end>
+        </item>
+
+        <item>
+            <name>xxx</name>
+            <distribution>uniform</distribution>
+            <start>90</start>
+            <end>110</end>
+        </item>
+                
+        <item>
+            <name>lxx</name>
+            <distribution>uniform</distribution>
+            <start>8</start>
+            <end>12</end>
+        </item>        
+
+    </parameters>
+    
+
+    <initial_conditions>
+        <item>
+            <name>ic1 </name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>500</end>
+        </item>
+
+        <item>
+            <name>ic2</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>500</end>
+        </item>
+        
+        <item>
+            <name>ic3</name>
+            <distribution>constant</distribution>
+            <start>250</start>
+            <end>NA</end>
+        </item>        
+        
+    </initial_conditions>
+
+</data>
+
+
+

@@ -1,20 +1,21 @@
 <data>
 
     <epsilon_t>
-        <end>10</end>
+        <end>1</end>
     </epsilon_t>
 
     <epsilon_vcl>
-        <end>10</end>
+        <end>100000000000</end>
     </epsilon_vcl>
 
     <eps_cl>
         <end>0.1</end>
     </eps_cl>
 
+    
     <steady_state>
         <standard_dev>0.0001</standard_dev>
-        <cluster_mean>0</cluster_mean>
+        <cluster_mean>15</cluster_mean>
     </steady_state>
 
     #Desired behaviour
@@ -30,43 +31,36 @@
         <end>1</end>
     </cluster_variance>
 
-    <particles>10</particles>
+    <particles>1000</particles>
 
-    <number_to_sample>10</number_to_sample>
+    <number_to_sample>10000</number_to_sample>
 
     <initial_conditions_samples>100</initial_conditions_samples>
 
     <alpha>0.1</alpha>
-    <dt>-1</dt>
+    <dt>0.1</dt>
     <det_clust_delta>0.0001</det_clust_delta>
     <kmeans_cutoff>0.00001</kmeans_cutoff>
-	<times_start>0</times_start>
-	<times_end>1000</times_end>
-	<times_twidth>0.5</times_twidth>	
-    <species_numb_to_fit>1 2</species_numb_to_fit>
 
+	<times_start>0</times_start>
+	<times_end>100</times_end>
+	<times_twidth>1</times_twidth>
+		
+    <species_numb_to_fit>1 2</species_numb_to_fit>
     #deterministic or stochastic
-    <stoch_determ>ODE</stoch_determ>
-    #det or gapstatistic
+    <stoch_determ>Gillespie</stoch_determ>
     <clustering>gapstatistic</clustering>
+    <cell_volume_first_param>False</cell_volume_first_param>    
     #sbml or cuda
     <model_file>cuda</model_file>
-    <sbml_name>model</sbml_name>
-    <cell_volume_first_param>True</cell_volume_first_param>
-    #uniform or lognormal. If lognormal start = mu, end = sigma.
+    <sbml_name>model_stoch</sbml_name>
     <parameters>
-        <item>
-            <name>parameter1</name>
-            <distribution>constant</distribution>
-            <start>1</start>
-            <end>NA</end>
-        </item>
 
         <item>
             <name>a1</name>
-            <distribution>log</distribution>
+            <distribution>uniform</distribution>
             <start>0</start>
-            <end>10</end>
+            <end>60</end>
         </item>
 
         <item>
@@ -80,7 +74,7 @@
             <name>a2</name>
             <distribution>uniform</distribution>
             <start>0</start>
-            <end>10</end>
+            <end>60</end>
         </item>
 
         <item>

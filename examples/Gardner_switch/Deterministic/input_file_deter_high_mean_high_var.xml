@@ -1,0 +1,114 @@
+<data>
+
+    <epsilon_t>
+        <end>100</end>
+    </epsilon_t>
+
+    <epsilon_vcl>
+        <end>100000000000</end>
+    </epsilon_vcl>
+
+    <eps_cl>
+        <end>0.1</end>
+    </eps_cl>
+
+    <steady_state>
+        <standard_dev>0.00001</standard_dev>
+        <cluster_mean>15</cluster_mean>
+    </steady_state>
+
+    #Desired behaviour
+    <number_of_clusters>
+        <end>2</end>
+    </number_of_clusters>
+
+    <total_variance>
+        <end>0.01</end>
+    </total_variance>
+
+    <cluster_variance>
+        <end>1</end>
+    </cluster_variance>
+
+    <particles>100</particles>
+
+    <number_to_sample>1000</number_to_sample>
+
+    <initial_conditions_samples>100</initial_conditions_samples>
+
+    <alpha>0.1</alpha>
+    <dt>-1</dt>
+    <det_clust_delta>0.0001</det_clust_delta>
+    <kmeans_cutoff>0.00001</kmeans_cutoff>
+
+	<times_start>0</times_start>
+	<times_end>100</times_end>
+	<times_twidth>1</times_twidth>
+		
+    <species_numb_to_fit>1 2</species_numb_to_fit>
+    #deterministic or stochastic
+    <stoch_determ>ODE</stoch_determ>
+    <clustering>gapstatistic</clustering>
+    <cell_volume_first_param>True</cell_volume_first_param>    
+    #sbml or cuda
+    <model_file>cuda</model_file>
+    <sbml_name>model_deter</sbml_name>
+    <parameters>
+		
+        <item>
+            <name>p1</name>
+            <distribution>constant</distribution>
+            <start>1</start>
+            <end>NA</end>
+        </item>
+
+        <item>
+            <name>a1</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>60</end>
+        </item>
+
+        <item>
+            <name>beta</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>5</end>
+        </item>
+
+        <item>
+            <name>a2</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>60</end>
+        </item>
+
+        <item>
+            <name>gamma</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>5</end>
+        </item>
+    </parameters>
+
+    <initial_conditions>
+        <item>
+            <name>ic1 </name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>100</end>
+        </item>
+
+        <item>
+            <name>ic2</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>100</end>
+        </item>
+        
+    </initial_conditions>
+
+</data>
+
+
+

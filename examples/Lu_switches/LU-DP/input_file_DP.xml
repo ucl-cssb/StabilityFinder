@@ -1,0 +1,192 @@
+<data>
+
+    <epsilon_t>
+        <end>10</end>
+    </epsilon_t>
+
+    <epsilon_vcl>
+        <end>20000</end>
+    </epsilon_vcl>
+
+    <eps_cl>
+        <end>0.0</end>
+    </eps_cl>
+
+    #Desired behaviour
+    <number_of_clusters>
+        <end>3</end>
+    </number_of_clusters>
+
+    <total_variance>
+        <end>1</end>
+    </total_variance>
+
+    <cluster_variance>
+        <end>1</end>
+    </cluster_variance>
+
+    <steady_state>
+		<standard_dev>0.001</standard_dev >
+		<cluster_mean>0</cluster_mean >
+    </steady_state>
+
+    <particles>10</particles>
+
+    <number_to_sample>100</number_to_sample>
+
+    <initial_conditions_samples>100</initial_conditions_samples>
+
+    <alpha>0.1</alpha>
+    <dt>-1</dt>
+    <det_clust_delta>10</det_clust_delta>
+    <kmeans_cutoff>0.00001</kmeans_cutoff>
+
+	<times_start>0</times_start>
+	<times_end>100</times_end>
+	<times_twidth>1</times_twidth>
+	
+    <species_numb_to_fit>1 2</species_numb_to_fit>
+    #deterministic or stochastic
+    <cell_volume_first_param>False</cell_volume_first_param>
+    <stoch_determ>ODE</stoch_determ>
+    <clustering>gapstatistic</clustering>
+    #sbml or cuda
+    <model_file>cuda</model_file>
+    <sbml_name>model_DP</sbml_name>
+    <parameters>
+        <item>
+            <name>gx</name>
+            <distribution>uniform</distribution>
+            <start>1</start>
+            <end>100</end>
+        </item>
+
+        <item>
+            <name>gy</name>
+            <distribution>uniform</distribution>
+            <start>1</start>
+            <end>100</end>
+        </item>
+
+        <item>
+            <name>kx</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>1</end>
+        </item>
+
+        <item>
+            <name>ky</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>1</end>
+        </item>
+
+        <item>
+            <name>nxy</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+
+        <item>
+            <name>nyx</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+
+        <item>
+            <name>xxy</name>
+            <distribution>uniform</distribution>
+            <start>100</start>
+            <end>1000</end>
+        </item>
+
+        <item>
+            <name>xyx</name>
+            <distribution>uniform</distribution>
+            <start>100</start>
+            <end>1000</end>
+        </item>
+
+        <item>
+            <name>lxy</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>1</end>
+        </item>
+        
+        <item>
+            <name>lyx</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>0.2</end>
+        </item>
+
+        <item>
+            <name>nXX</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+
+        <item>
+            <name>nYY</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+
+        <item>
+            <name>xXX</name>
+            <distribution>uniform</distribution>
+            <start>50</start>
+            <end>500</end>
+        </item>
+
+        <item>
+            <name>xYY</name>
+            <distribution>uniform</distribution>
+            <start>50</start>
+            <end>500</end>
+        </item>
+
+        <item>
+            <name>lXX</name>
+            <distribution>uniform</distribution>
+            <start>1</start>
+            <end>20</end>
+        </item>
+
+        <item>
+            <name>lYY</name>
+            <distribution>uniform</distribution>
+            <start>1</start>
+            <end>20</end>
+        </item>
+
+    </parameters>
+    
+
+    <initial_conditions>
+        <item>
+            <name>ic1 </name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>500</end>
+        </item>
+
+        <item>
+            <name>ic2</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>500</end>
+        </item>
+        
+    </initial_conditions>
+
+</data>
+
+
+

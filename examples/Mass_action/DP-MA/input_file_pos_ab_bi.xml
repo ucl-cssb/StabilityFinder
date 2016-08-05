@@ -1,0 +1,224 @@
+<data>
+
+    <epsilon_t>
+        <end>10</end>
+    </epsilon_t>
+
+    <epsilon_vcl>
+        <end>150000000</end>
+    </epsilon_vcl>
+
+    <eps_cl>
+        <end>0.1</end>
+    </eps_cl>
+
+    #Desired behaviour
+    <number_of_clusters>
+        <end>2</end>
+    </number_of_clusters>
+
+    <total_variance>
+        <end>1</end>
+    </total_variance>
+
+    <cluster_variance>
+        <end>1</end>
+    </cluster_variance>
+
+    <steady_state>
+		<standard_dev>0.001</standard_dev >
+		<cluster_mean>50</cluster_mean >
+    </steady_state>
+
+    <particles>1000</particles>
+
+    <number_to_sample>1000</number_to_sample>
+
+    <initial_conditions_samples>100</initial_conditions_samples>
+
+    <alpha>0.1</alpha>
+    <dt>0.1</dt>
+    <det_clust_delta>1</det_clust_delta>
+    <kmeans_cutoff>0.00001</kmeans_cutoff>
+
+	<times_start>0</times_start>
+	<times_end>100</times_end>
+	<times_twidth>1</times_twidth>
+	
+	<species_numb_to_fit>5 6</species_numb_to_fit>
+    <cell_volume_first_param>True</cell_volume_first_param>
+    #deterministic or stochastic
+    <clustering>gapstatistic</clustering>    
+    <stoch_determ>Gillespie</stoch_determ>
+    #sbml or cuda
+    <model_file>cuda</model_file>
+    <sbml_name>sw_pos_ab_dim_deg_no_sym_no_sr_sbml_bi</sbml_name>
+     <parameters>
+        <item>
+            <name>parameter1</name>
+            <distribution>constant</distribution>
+            <start>1</start>
+            <end>NA</end>
+        </item>
+
+        <item>
+            <name>geA</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+
+        <item>
+            <name>repA</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+
+        <item>
+            <name>rep_r</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+
+        <item>
+            <name>dim</name>
+            <distribution>uniform</distribution>
+            <start>7</start>
+            <end>15</end>
+        </item>
+        <item>
+            <name>dim_r</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+
+        <item>
+            <name>deg</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+
+        <item>
+            <name>aut_1</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+
+        <item>
+            <name>aut_2</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item> 
+        
+        <item>
+            <name>aut_3</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+        
+        <item>
+            <name>deg_dim</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>1</end>
+        </item>
+        
+        <item>
+            <name>geB</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>        
+        
+        <item>
+            <name>repB</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>10</end>
+        </item>
+    </parameters>
+
+    <initial_conditions>
+        <item>
+            <name>A</name>
+            <distribution>constant</distribution>
+            <start>0</start>
+            <end>NA</end>
+        </item>
+
+        <item>
+            <name>gA</name>
+            <distribution>constant</distribution>
+            <start>1</start>
+            <end>NA</end>
+        </item>
+
+        <item>
+            <name>B</name>
+            <distribution>constant</distribution>
+            <start>0</start>
+            <end>NA</end>
+        </item>
+
+        <item>
+            <name>gB</name>
+            <distribution>constant</distribution>
+            <start>1</start>
+            <end>NA</end>
+        </item>
+
+        <item>
+            <name>A2</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>100</end>
+        </item>
+
+        <item>
+            <name>B2</name>
+            <distribution>uniform</distribution>
+            <start>0</start>
+            <end>100</end>
+        </item>
+
+        <item>
+            <name>B2gA</name>
+            <distribution>constant</distribution>
+            <start>0</start>
+            <end>NA</end>
+        </item>
+
+        <item>
+            <name>A2gB</name>
+            <distribution>constant</distribution>
+            <start>0</start>
+            <end>NA</end>
+        </item>
+        
+        <item>
+            <name>B2gB</name>
+            <distribution>constant</distribution>
+            <start>0</start>
+            <end>NA</end>
+        </item>    
+        
+        <item>
+            <name>A2gA</name>
+            <distribution>constant</distribution>
+            <start>0</start>
+            <end>NA</end>
+        </item>
+            
+    </initial_conditions>
+
+</data>
+
+
+

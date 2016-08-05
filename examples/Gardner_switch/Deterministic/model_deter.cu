@@ -10,14 +10,20 @@
 #define eq(a,b) a==b
 #define and_(a,b) a&&b
 #define or_(a,b) a||b
+
+__device__ double function_1(double a1,double a2){
+    return pow(a1, a2);
+}
+
+
 struct myFex{
     __device__ void operator()(int *neq, double *t, double *y, double *ydot/*, void *otherData*/){
 
         int tid = blockDim.x * blockIdx.x + threadIdx.x;
 
 
-        ydot[0]=tex2D(param_tex,0,tid)*(((tex2D(param_tex,1,tid))/(1+__powf(y[1],tex2D(param_tex,2,tid))))-y[0]);
-        ydot[1]=tex2D(param_tex,0,tid)*(((tex2D(param_tex,3,tid))/(1+__powf(y[0],tex2D(param_tex,4,tid))))-y[1]);
+        ydot[0]=tex2D(param_tex,0,tid)*(((tex2D(param_tex,1,tid))/(1+function_1(y[1],tex2D(param_tex,2,tid))))-y[0]);
+        ydot[1]=tex2D(param_tex,0,tid)*(((tex2D(param_tex,3,tid))/(1+function_1(y[0],tex2D(param_tex,4,tid))))-y[1]);
 
     }
 };
