@@ -29,7 +29,7 @@ $ export PATH=\<dir\>:$PATH
 
 Using the package
 -------------------
-##The working directory
+###The working directory
 
 The working directory must contain the following les. Each one is described in detail in the section
 following.
