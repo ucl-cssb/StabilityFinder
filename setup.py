@@ -1,12 +1,12 @@
 from distutils.core import setup
 
-setup(name='stabilitychecker',
+setup(name='stabilityfinder',
       version='1.2.0.dev1',
-      description='Checking the stability of a model under parameter uncertainty',
+      description='Finding the stability of a model under parameter uncertainty',
       author='Miriam Leon',
       author_email='miriam.leon.12@ucl.ac.uk',
-      url='https://github.com/Mirelio/StabilityChecker.git',
-      packages=['stabilitychecker'],
+      url='https://github.com/ucl-cssb/StabilityFinder.git',
+      packages=['stabilityfinder'],
       package_data={
           '':['*.R']
       }
