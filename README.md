@@ -150,6 +150,5 @@ diagonal represent the marginal distributions for the values of each parameter t
 final population, thus the ones that can produce bistable behaviour. The pairwise joint distributions are
 found on the side plots.
 
-![alt tag](https://raw.githubusercontent.com/ucl-cssb/StabilityFinder/examples/Gardner_switch/Deterministic/posterior.png)
-
+![Alt text](examples/Gardner_switch/Deterministic/posterior.png?raw=true "Optional Title")
 
