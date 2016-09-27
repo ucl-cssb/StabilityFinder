@@ -31,7 +31,7 @@ Using the package
 -------------------
 ###The working directory
 
-The working directory must contain the following les. Each one is described in detail in the section
+The working directory must contain the following files. Each one is described in detail in the section
 following.
 input file.xml The user input file
 run.sh The shell script that will initialise the scripts
@@ -150,6 +150,6 @@ diagonal represent the marginal distributions for the values of each parameter t
 final population, thus the ones that can produce bistable behaviour. The pairwise joint distributions are
 found on the side plots.
 
-![alt tag](StabilityFinder/examples/Gardner_switch/Deterministic/posterior.png)
+![alt tag](https://raw.githubusercontent.com/ucl-cssb/StabilityFinder//examples/Gardner_switch/Deterministic/posterior.png)
 
 
