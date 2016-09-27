@@ -151,4 +151,6 @@ final population, thus the ones that can produce bistable behaviour. The pairwis
 found on the side plots.
 
 ![Alt text](examples/Gardner_switch/Deterministic/posterior.png?raw=true "Optional Title")
-
+The posterior distribution of the Gardner toggle switch produced by StabilityChecker. The
+marginal distributions of each parameter are found on the diagonal and pairwise joint distributions along
+the sides.
