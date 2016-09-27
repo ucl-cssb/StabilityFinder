@@ -85,10 +85,10 @@ must be named model.cu.
   * **end** The upper limit of the distribution to sample from. Note that if the distribution is
 * **constant** this value is not read.
 * **initial conditions** The species included in the model.
-* **item** One item corresponds to one species. The number and order of the items must strictly correspond to those of the species in the model provided.
-* **name** The name of the species. Note that the species are read by order and not name from the model.
-* **distribution** From what distribution to sample values from. The two options are constant and uniform. Strictly two species must be set to uniform and the rest constant.
-  * **start** The lower limit of the distribution to sample from.
-  * **end** The upper limit of the distribution to sample from. Note that if the distribution is constant this value is not read.
+  * **item** One item corresponds to one species. The number and order of the items must strictly correspond to those of the species in the model provided.
+  * **name** The name of the species. Note that the species are read by order and not name from the model.
+  * **distribution** From what distribution to sample values from. The two options are constant and uniform. Strictly two species must be set to uniform and the rest constant.
+    * **start** The lower limit of the distribution to sample from.
+    * **end** The upper limit of the distribution to sample from. Note that if the distribution is constant this value is not read.
 
 
