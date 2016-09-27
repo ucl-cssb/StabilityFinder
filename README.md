@@ -6,13 +6,13 @@ Installation
 StabilityFinder has been developed to work on a Linux operating system, with GPU support.
 The following dependencies are essential for the successful implementation of the package:
   
- -numpy
- -logging
- -cuda-sim
- -libsbml
- -R
- -ggplot2
- -pycuda
+* numpy
+* logging
+* cuda-sim
+* libsbml
+* R
+* ggplot2
+* pycuda
  
  
 $ cd StabilityFinder
@@ -90,5 +90,65 @@ must be named model.cu.
   * **distribution** From what distribution to sample values from. The two options are constant and uniform. Strictly two species must be set to uniform and the rest constant.
     * **start** The lower limit of the distribution to sample from.
     * **end** The upper limit of the distribution to sample from. Note that if the distribution is constant this value is not read.
+
+####Output
+
+The outputs from running StabilityFinder are saved in the results_txt_files folder. This folder
+contains two files and one folder per population. The two files are the following:
+* **Parameter_values_final** Each line contains the values of the parameters in the order set in
+the input_file.xml file and each line corresponds to an accepted particle in the final accepted
+population.
+* **Parameter_weights_final** Contains the weights of each particle (parameter set) in the nal ac-
+cepted population.
+Each population folder contains the following files:
+* **data_PopulationN.txt** Each line contains the values of the parameters in the order set in the
+input_file.xml file and each line corresponds to an accepted particle.
+* **data_WeightsN.txt** Contains the weights of each particle (parameter set).
+* **One set_resultXX** per parameter set. Each line contains the steady state value of each species, in order specified in the input_file.xml file, species numb to fit. Each line corresponds to one initial condition set.
+The plot of the posterior is saved in the posterior.pdf file in the working directory. The plot is interpreted as follows:
+* The marginal distributions of each parameter are found on the diagonal
+* The pairwise joint distributions are found along the sides. The location of each pairwise joint distribution is determined by which pair of parameters are compared.
+
+Running StabilityFinder
+------------------------
+To run StabilityFinder, and once the input_file.xml file is completed, the run.sh file must be
+executed. The progress of the algorithm can be followed in the my_abc_scan.log file. Once StabilityFinder is finished the posterior can be seen in the posterior.pdf file.
+The phase plots of the populations can be visualised by plotting the contents of the set_resultXX file
+for each parameter set.
+
+Examples
+---------
+####The simple genetic toggle switch using ODEs
+#####Setting up
+
+**Model**
+This example does not use an SBML model but instead provides StabilityFinder with the cuda file
+directly. This is the model.cu file.
+**Input file**
+The input file is set up as shown in the examples folder. As this model only contains two species, u and v, these are selected for thefit as well as initial condition scan.
+**run file**
+The pythonpath must be set to point to the directory in which cuda sim was installed.
+$export PATH=\<dir\>:$PATH
+In addition, the exe=\<dir\> variable must be set to the directory in which StabilityChecker is installed.
+
+#####Running the example
+
+The working directory must contain the following:
+* The model.cu file
+* The completed input.xml file
+* The customised run.sh file
+* The plot_posterior.R file
+The run.sh file is then executed:
+./run.sh
+The progress of the algorithm can be followed in the my_abc_scan.log file.
+
+
+#####Results
+
+The posterior is found in the posterior.pdf file. It is the one shown in Figure 5.1. The plots on the
+diagonal represent the marginal distributions for the values of each parameter that were found in the
+final population, thus the ones that can produce bistable behaviour. The pairwise joint distributions are
+found on the side plots.
+
 
 
