@@ -6,17 +6,24 @@ Installation
 StabilityFinder has been developed to work on a Linux operating system, with GPU support.
 The following dependencies are essential for the successful implementation of the package:
   
+Python packages:
 * numpy
 * logging
-* cuda-sim
 * libsbml
+* pycuda
+
+R packages:
 * R
 * ggplot2
-* pycuda
+
+ Other packages:
+ *cuda-sim
+ https://sourceforge.net/projects/cuda-sim/
  
+Once these have been downloaded and successfully installed, the following commands should be used to install StabilityFinder:
  
-$ cd StabilityFinder
-$ python setup.py install
+* $ cd StabilityFinder
+* $ python setup.py install
  
 This will copy the module StabilityChecker into the lib/pythonXX/site-packages directory,
 where XX corresponds to the python version that was used. An exe=\<dir\> variable should also be added
