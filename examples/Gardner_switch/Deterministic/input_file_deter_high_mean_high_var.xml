@@ -30,9 +30,9 @@
         <end>1</end>
     </cluster_variance>
 
-    <particles>100</particles>
+    <particles>10</particles>
 
-    <number_to_sample>1000</number_to_sample>
+    <number_to_sample>100</number_to_sample>
 
     <initial_conditions_samples>100</initial_conditions_samples>
 

@@ -71,7 +71,7 @@ def central():
         logger.info('RUN')
         logger.info('population: %s', pop_indic+1)
         parameters_sampled = sample_priors(number_to_sample, lims)
-        cudasim_result = simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, stoch_determ, modelInstance, ics, lims)
+        cudasim_result, init_cond_list = simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, stoch_determ, modelInstance, ics, lims)
         distances_matrix, set_results = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff, clustering)
         parameters_accepted = parameters_sampled[0:int(number_particles)]
         accepted_distances = distances_matrix[0:int(number_particles)]
@@ -81,7 +81,7 @@ def central():
         pop_fold_res_path = 'Population_'+str(pop_indic+1)
         os.makedirs(results_path+'/'+pop_fold_res_path)
         current_weights_list = particle_weights(parameters_accepted)
-        save_results_files(simulations_accepted, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic)
+        save_results_files(simulations_accepted, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic, init_cond_list)
         pop_indic += 1
 
     while finishTotal == False:
@@ -101,7 +101,7 @@ def central():
 
             parameters_sampled, current_sampled_weights = sample_params(previous_parameters, previous_weights_list, number_to_sample)
             perturbed_particles = perturb_particles(parameters_sampled, lims, cell_volume_first_param)
-            cudasim_result = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample,stoch_determ, modelInstance, ics, lims)
+            cudasim_result, init_cond_list = simulate_dataset(perturbed_particles, number_to_sample, init_cond_to_sample,stoch_determ, modelInstance, ics, lims)
             distances_matrix, set_results = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff, clustering)
             parameters_sampled, distances_matrix, set_results = accept_reject_params(distances_matrix, perturbed_particles, epsilons, ss_std, cluster_mean_min, set_results, init_cond_to_sample)
             # Append the accepted ones to a matrix which will be built up until you reach the number of particles you want
@@ -129,7 +129,7 @@ def central():
             if finished == True:
                 break
         current_weights_list = perturbed_particle_weights(parameters_accepted, previous_parameters, lims)
-        save_results_files(simulations_accepted, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic)
+        save_results_files(simulations_accepted, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic, init_cond_list)
         pop_indic += 1
               
         if epsilons[0] <= epsilons_final[0] and epsilons[1] <= epsilons_final[1] and epsilons[2] <= epsilons_final[2]:
@@ -137,10 +137,11 @@ def central():
             logger.info('Last population finished')
             final_weights = current_weights_list[:]
             final_particles = parameters_accepted[:][:]
+            final_init_cond_list = init_cond_list
             logger.info('Re-sampling posterior')
             #Sample from posterior
             post_samp, post_weights = sample_params(final_particles, final_weights, number_to_sample)
-            cudasim_result = simulate_dataset(post_samp, number_to_sample, init_cond_to_sample, stoch_determ, modelInstance, ics, lims)
+            cudasim_result, init_cond_list = simulate_dataset(post_samp, number_to_sample, init_cond_to_sample, stoch_determ, modelInstance, ics, lims)
             distances_matrix, set_results = measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff, clustering)
             pop_fold_res_path = '/re_sampled_posterior'
             os.makedirs(results_path+'/re_sampled_posterior')
@@ -148,7 +149,7 @@ def central():
                 numpy.savetxt(str(results_path)+'/re_sampled_posterior'+'/set_result'+str(i)+'.txt', set_results[i], delimiter=' ')
             end = time.time()
             logger.info('TIME: %s', end - start)
-    return final_weights, final_particles, pop_fold_res_path, results_path, times
+    return final_weights, final_particles, final_init_cond_list, pop_fold_res_path, results_path, times
 
 
 def prepare_next_pop(parameters_accepted, current_weights_list, alpha, distances_matrix):
@@ -248,7 +249,7 @@ def simulate_dataset(parameters_sampled, number_to_sample, init_cond_to_sample, 
             expanded_params_list.append(i)
     init_cond_list = sampl_initi_condit.sample_init(number_to_sample, init_cond_to_sample, ics)
     result = modelInstance.run(expanded_params_list, init_cond_list)
-    return result
+    return result, init_cond_list
 
 def measure_distance(cudasim_result, number_to_sample, final_desired_values, init_cond_to_sample, species_numb_to_fit, stoch_determ, det_clust_delta, kmeans_cutoff, clustering):
     set_results = []
@@ -374,9 +375,10 @@ def accept_reject_params(distances_matrix, parameters_sampled, epsilons, ss_std,
     logger.info('third steady state level: %s', fail_counter_5)
     return parameters_sampled, distances_matrix, set_results
 
-def save_results_files(simulations_accepted, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic ):
+def save_results_files(simulations_accepted, results_path, pop_fold_res_path, parameters_accepted, current_weights_list, pop_indic, init_cond_list):
     numpy.savetxt(results_path+'/'+str(pop_fold_res_path)+'/data_Population'+str(pop_indic+1)+'.txt', parameters_accepted, delimiter=' ')
     numpy.savetxt(results_path+'/'+str(pop_fold_res_path)+'/data_Weights'+str(pop_indic+1)+'.txt', current_weights_list, delimiter=' ')
+    numpy.savetxt(results_path+'/'+str(pop_fold_res_path)+'/init_cond_list'+str(pop_indic+1)+'.txt', init_cond_list, delimiter=' ')
     for i in range(0, len(simulations_accepted)):
         numpy.savetxt(str(results_path)+'/'+str(pop_fold_res_path)+'/set_result'+str(i)+'.txt', simulations_accepted[i], delimiter=' ')
     return
@@ -475,12 +477,13 @@ def perturbed_particle_weights(parameters_accepted, previous_parameters, lims):
     return current_weights_list
 
 logger = logging.getLogger(__name__)
-final_weights, final_particles, pop_fold_res_path, results_path, times = central()
+final_weights, final_particles, final_init_cond_list, pop_fold_res_path, results_path, times = central()
 final_path_v = str(results_path)+'/Parameter_values_final.txt'
 final_path_w = str(results_path)+'/Parameter_weights_final.txt'
+final_path_ics = str(results_path)+'/Initial_conditions_final.txt'
 numpy.savetxt(final_path_v, final_particles, delimiter=' ')
 numpy.savetxt(final_path_w, final_weights, delimiter=' ')
-
+numpy.savetxt(final_path_ics, final_init_cond_list, delimiter=' ')
 #f1 = open('species_timecourse_1.txt', 'a')
 #f2 = open('species_timecourse_2.txt', 'a')
 

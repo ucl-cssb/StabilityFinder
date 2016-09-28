@@ -1,8 +1,22 @@
+args = commandArgs(trailingOnly=TRUE)
+
+
+# test if there is at least one argument: if not, return an error
+if (length(args)==0) {
+  stop("At least one argument must be supplied (results files directory).n", call.=FALSE)
+} else if (length(args)==1) {
+  # default output file
+  args[2] = "phase_plots.pdf"
+}
+
+
 library(ggplot2)
 library(gridExtra)
 library(grid)
-plot_stabilityChecker_particles <- function(numb_files, filename){
+plot_stabilityChecker_particles <- function(){
+  setwd(args[1])
   filelist <- list.files(pattern = "set_result*")
+  numb_files <- length(filelist)
   data_list = lapply(filelist, read.table, sep = " ")
   pltList <- list()
   for(i in 1:numb_files){
@@ -26,13 +40,13 @@ plot_stabilityChecker_particles <- function(numb_files, filename){
     theme(axis.text.x = element_text(angle = 60, hjust = 1, vjust = 1))
   }
 
-  pdf('phase_plots.pdf')
+  pdf(args[2])
   do.call("grid.arrange", pltList)
   dev.off()
 
 
 }
-plot_stabilityChecker_particles(10, "switch_result")
+plot_stabilityChecker_particles()
 
 
 

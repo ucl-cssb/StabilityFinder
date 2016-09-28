@@ -30,7 +30,7 @@ plot_posterior_distr <- function(limits, param_names, p_values_final){
                 plot.background=element_blank(),
                 plot.margin=unit(c(0,0,0.2,0), "lines"))
       }else{
-        pltList[[k]] <-ggplot(p_values_final, aes_string(x = param_names[i], y = param_names[j], weight=param_names[ncol(p_values_final)])) + xlim(a[i],b[i])+ ylim(a[j],b[j])+
+        pltList[[k]] <-ggplot(p_values_final, aes_string(x = param_names[i], y = param_names[j])) + xlim(a[i],b[i])+ ylim(a[j],b[j])+
           stat_density2d(aes(alpha=..level.., fill=..level.., weight=weights),
                          size=2, geom="polygon") +
           scale_fill_gradient(low = "yellow", high = "red") +
