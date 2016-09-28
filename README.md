@@ -16,8 +16,8 @@ R packages:
 * R
 * ggplot2
 
- Other packages:
- *cuda-sim
+Other packages:
+ * cuda-sim
  https://sourceforge.net/projects/cuda-sim/
  
 Once these have been downloaded and successfully installed, the following commands should be used to install StabilityFinder:
