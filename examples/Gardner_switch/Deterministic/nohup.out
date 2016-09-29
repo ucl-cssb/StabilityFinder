@@ -1,7 +1,0 @@
-cuda-sim: GPU blocks / threads / running time: 64 157 6.1716 s
-cuda-sim: GPU blocks / threads / running time: 64 157 6.1577 s
-cuda-sim: GPU blocks / threads / running time: 64 157 6.029 s
-./run_deter_high_mean_high_var.sh: line 7: 16616 Killed                  python $exe/my_abc.py -i input_file_deter_high_mean_high_var.xml -o results_deter_high_mean_high_var -l gardner_deter_high_mean_high_var.log
-cuda-sim: GPU blocks / threads / running time: 64 157 6.2043 s
-cuda-sim: GPU blocks / threads / running time: 64 157 6.1136 s
-cuda-sim: GPU blocks / threads / running time: 64 157 6.035 s
