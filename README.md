@@ -118,7 +118,7 @@ Each population folder contains the following files:
 * **data_PopulationN.txt** Each line contains the values of the parameters in the order set in the
 input_file.xml file and each line corresponds to an accepted particle.
 * **data_WeightsN.txt** Contains the weights of each particle (parameter set).
-* **One set_resultXX** per parameter set. Each line contains the steady state value of each species, in order specified in the input_file.xml file, species numb to fit. Each line corresponds to one initial condition set.
+* One **set_resultXX** per parameter set. Each line contains the steady state value of each species, in order specified in the input_file.xml file, species numb to fit. Each line corresponds to one initial condition set.
 The plot of the posterior is saved in the posterior.pdf file in the working directory. The plot is interpreted as follows:
 * The marginal distributions of each parameter are found on the diagonal
 * The pairwise joint distributions are found along the sides. The location of each pairwise joint distribution is determined by which pair of parameters are compared.
@@ -141,22 +141,27 @@ directly. This is the model.cu file.
 **Input file**
 The input file is set up as shown in the examples folder. As this model only contains two species, u and v, these are selected for thefit as well as initial condition scan.
 **run file**
-The pythonpath must be set to point to the directory in which cuda sim was installed.
+The pythonpath must be set to point to the directory in which cuda-sim was installed.
 $export PATH=\<dir\>:$PATH
 In addition, the exe=\<dir\> variable must be set to the directory in which StabilityChecker is installed.
 
 #####Running the example
+Navigate to the folder containing the example, which is under StabilityFinder/examples/Gardner/Deterministic/
 
 The working directory must contain the following:
 * The model.cu file
 * The completed input.xml file
 * The customised run.sh file
-* The plot_posterior.R file
-The run.sh file is then executed:
+
+The algorithm is initiated by running the run.sh file. This is done by typing:
+
+
 ./run.sh
+
+
 The progress of the algorithm can be followed in the my_abc_scan.log file.
 
-
+Once the algorithm has ended, the results can be visualised by running the R files. 
 #####Results
 
 ######Plotting the results
