@@ -138,8 +138,10 @@ Examples
 **Model**
 This example does not use an SBML model but instead provides StabilityFinder with the cuda file
 directly. This is the model.cu file.
+
 **Input file**
-The input file is set up as shown in the examples folder. As this model only contains two species, u and v, these are selected for thefit as well as initial condition scan.
+The input file is set up as shown in the examples folder. As this model only contains two species, u and v, these are selected for the fit as well as initial condition scan.
+
 **run file**
 The pythonpath must be set to point to the directory in which cuda-sim was installed.
 $export PATH=\<dir\>:$PATH
