@@ -60,41 +60,47 @@ between the tags.
 
 * **epsilons** The acceptable distance from the desired value.
   * **epsilon t** Total variance in the data
-    * **start** The initial cut-off value for the distance from the desired values.
     * **end** The final cut-off value for the distance from the desired values.
-  * **epsilon vcl** Within-cluster variance
-    * **start** The initial cut-off value for the distance from the desired values.
+  * **epsilon_vcl** Within-cluster variance
     * **end** The final cut-off value for the distance from the desired values.
-  * **eps cl** Number of clusters
-    * **start** The initial cut-off value for the distance from the desired values.
+  * **eps_cl** Number of clusters
     * **end** The final cut-off value for the distance from the desired values.
+  
 * Desired final values The desired values the algorithm will converge to.
+  * **steady_state** 
+    * **standard_dev** The standard deviation of the last 10 time points that will determine of the system is in steady state
+    * **cluster_mean** The minimum value for the mean of the clusters
   * **number of clusters** The number of clusters in the data,describing its stability.
   * **total variance** The total variance in the data.
   * **cluster variance** The within-cluster variance in the data.
 * **particles** The number of accepted parameter sets required to proceed to the next iteration.
 * **number to sample** Number of parameter sets to sample from for iteration. This needs to be greater or equal to the particles.
-* **initial conditions** samples Number of initial condition sets to sample for each parameter set at each iteration.
-* **alpha** A value that describes the step size for the incremental reduction of the epsilon at each iteration.
-This should be set to a small value (a = 0.1) to speed up the algorithm.
-* **times** The time points for the simulation are given as a whitespace delimited list.
-* **species numb to fit** Which two species numbers to be t by the algorithm. The should be whitespace
-delimited.
+* **initial conditions samples** Number of initial condition sets to sample for each parameter set at each iteration. The value has to have an integer sqare root.
+* **alpha** A value that describes the step size for the incremental reduction of the epsilon at each iteration. This should be set to a small value (a = 0.1) to speed up the algorithm, or a larger value to take smaller steps. 
+* **dt** the time step to be used for the simulaions. If the system is deterministic, this should be set to -1.
+* **det_clust_delta** 
+* **kmeans_cutoff**
+* **times** 
+  * **times_start** The first timepoint
+  * **times_end** The last timepoint
+  * **times_twidth** The step size of the time structure
+* **species numb to fit** Which two species numbers to be fit by the algorithm. The should be whitespace delimited.
 * **stoch determ** The type of simulation to be used. The two options are stochastic or deterministic.
+* **clustering** The clustering algorithm to be used. The two options are gapstatistic or det.
+* **cell_volume_first_param** True or False. This dictates whether the first parameter is to be ignored.
 * **model file** Whether the model provided is in SBML or cuda format. The two options are sbml and cuda.
-* **sbml name** The name of the SBML file that will be provided. Note that if a cuda file is provided, that
-must be named model.cu.
+* **sbml name** The name of the SBML file that will be provided. Note that if a cuda file is provided, that must be named model.cu.
+
 * **parameters** The parameters included in the model.
   * **item** One item corresponds to one parameter. The number and order of the items must strictly correspond to those of the parameters in the model provided.
-  * **name** The name of the parameter. Note that the parameters are read by order and not name from the model. The name provided here is used in the plotting module.
-* **distribution** From what distribution to sample values from. The two options are constant and uniform.
-  * **start** The lower limit of the distribution to sample from.
-  * **end** The upper limit of the distribution to sample from. Note that if the distribution is
-* **constant** this value is not read.
+    * **name** The name of the parameter. Note that the parameters are read by order and not name from the model. The name provided here is used in the plotting module.
+    * **distribution** From what distribution to sample values from. The two options are constant and uniform.
+    * **start** The lower limit of the distribution to sample from.
+    * **end** The upper limit of the distribution to sample from. Note that if the distribution is constant this value is not read.
 * **initial conditions** The species included in the model.
   * **item** One item corresponds to one species. The number and order of the items must strictly correspond to those of the species in the model provided.
-  * **name** The name of the species. Note that the species are read by order and not name from the model.
-  * **distribution** From what distribution to sample values from. The two options are constant and uniform. Strictly two species must be set to uniform and the rest constant.
+    * **name** The name of the species. Note that the species are read by order and not name from the model.
+    * **distribution** From what distribution to sample values from. The two options are constant and uniform. Strictly two species must be set to uniform and the rest constant.
     * **start** The lower limit of the distribution to sample from.
     * **end** The upper limit of the distribution to sample from. Note that if the distribution is constant this value is not read.
 
@@ -102,11 +108,12 @@ must be named model.cu.
 
 The outputs from running StabilityFinder are saved in the results_txt_files folder. This folder
 contains two files and one folder per population. The two files are the following:
-* **Parameter_values_final** Each line contains the values of the parameters in the order set in
+* **Parameter_values_final.txt** Each line contains the values of the parameters in the order set in
 the input_file.xml file and each line corresponds to an accepted particle in the final accepted
 population.
-* **Parameter_weights_final** Contains the weights of each particle (parameter set) in the nal ac-
+* **Parameter_weights_final.txt** Contains the weights of each particle (parameter set) in the final ac-
 cepted population.
+* **Initial_conditions_final.txt** Contains the initial condition values sampled for the two proteins of interest.
 Each population folder contains the following files:
 * **data_PopulationN.txt** Each line contains the values of the parameters in the order set in the
 input_file.xml file and each line corresponds to an accepted particle.
