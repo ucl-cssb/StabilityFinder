@@ -154,12 +154,18 @@ The progress of the algorithm can be followed in the my_abc_scan.log file.
 
 ######Plotting the results
 To plot the phase plot type the following command in the directory where the plot_phase_space.R file is:
-Rscript plot_phase_space.R last_population_directory_file_path
+
+
+$Rscript plot_phase_space.R last_population_directory_file_path
+
 
 * **last_population_directory_file_path** the file path to the folder of the last population
 
 To plot the posterior distribution, type the following command in the directory where the plot_posterior.R file is: 
-Rscript plot_posterior.R input_file_path file_path_to_results_directory ignore_first_parameter outfile 
+
+
+$Rscript plot_posterior.R input_file_path file_path_to_results_directory ignore_first_parameter outfile 
+
 
 * **input_file_path** the file path and the name of the input file
 * **file_path_to_results_directory** the file path to the results directory
