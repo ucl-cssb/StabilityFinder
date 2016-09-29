@@ -1,3 +1,16 @@
+args = commandArgs(trailingOnly=TRUE)
+
+
+# test if there is at least one argument: if not, return an error
+if (length(args)==0) {
+  stop("At least one argument must be supplied (input file).n", call.=FALSE)
+} else if (length(args)==1) {
+  # default output file
+  args[4] = "posterior.pdf"
+}
+
+
+
 library(ggplot2)
 library(gridExtra)
 library(XML)
@@ -50,26 +63,38 @@ plot_posterior_distr <- function(limits, param_names, p_values_final){
                 plot.margin=unit(c(0,0,0,0), "lines"))
       }
     }
-   pdf('posterior_stch.pdf')
+   pdf(args[4])
    do.call("grid.arrange", pltList)
    dev.off()
 }
 #Set path to data and weights here:
-p_values_final = read.table("results_stoch5_high_mean/Parameter_values_final.txt")
-p_weights_final = read.table("results_stoch5_high_mean/Parameter_weights_final.txt")
+p_values_final = read.table(paste(args[2],"/Parameter_values_final.txt", sep = ""))
+p_weights_final = read.table(paste(args[2],"/Parameter_weights_final.txt", sep = ""))
 
 #The first parameter is ignored. If it shouldn't be removed then comment out the following line.
-#p_values_final <- subset(p_values_final, select = -p_values_final[,1] )
-
-p_values_final$param_weights <- unlist(p_weights_final)
-doc = xmlInternalTreeParse("input_file_stoch_5_high_mean.xml")
-top = xmlRoot(doc)
-df <- xmlToDataFrame(top[["parameters"]])
-
-#The first parameter is ignored. If it shouldn't be, remove the -1 in the following three lines.
-lim <- df[, 3:4]
-limits <- do.call(cbind, lapply(df[, 3:4], as.vector))
-param_nam <- do.call(cbind, lapply(df[,1], as.character))
+if(args[3] == TRUE){
+  
+  p_values_final <- subset(p_values_final, select = -p_values_final[,1] )
+  p_values_final$param_weights <- unlist(p_weights_final)
+  doc = xmlInternalTreeParse(args[1])
+  top = xmlRoot(doc)
+  df <- xmlToDataFrame(top[["parameters"]])
+  lim <- df[-1, 3:4]
+  limits <- do.call(cbind, lapply(df[-1, 3:4], as.vector))
+  param_nam <- do.call(cbind, lapply(df[-1,1], as.character))
+}else{
+  
+  p_values_final$param_weights <- unlist(p_weights_final)
+  doc = xmlInternalTreeParse(args[1])
+  top = xmlRoot(doc)
+  df <- xmlToDataFrame(top[["parameters"]])
+  
+  #The first parameter is ignored. If it shouldn't be, remove the -1 in the following three lines.
+  lim <- df[, 3:4]
+  limits <- do.call(cbind, lapply(df[, 3:4], as.vector))
+  param_nam <- do.call(cbind, lapply(df[,1], as.character))
+  
+}
 
 param_names <- c(param_nam,"weights")
 colnames(p_values_final) = c(param_nam,"weights")
