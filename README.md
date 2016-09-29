@@ -152,6 +152,20 @@ The progress of the algorithm can be followed in the my_abc_scan.log file.
 
 #####Results
 
+######Plotting the results
+To plot the phase plot type the following command in the directory where the plot_phase_space.R file is:
+- Rscript plot_phase_space.R last_population_directory_file_path
+
+* **last_population_directory_file_path** the file path to the folder of the last population
+
+To plot the posterior distribution, type the following command in the directory where the plot_posterior.R file is: 
+- Rscript plot_posterior.R input_file_path file_path_to_results_directory ignore_first_parameter outfile 
+
+* **input_file_path** the file path and the name of the input file
+* **file_path_to_results_directory** the file path to the results directory
+* **ignore_first_parameter** TRUE/FALSE value. If TRUE, the first parameter is ignored 
+* **outfile** the name of the posterior output file
+
 The posterior is found in the posterior.pdf file. It is the one shown in Figure 5.1. The plots on the
 diagonal represent the marginal distributions for the values of each parameter that were found in the
 final population, thus the ones that can produce bistable behaviour. The pairwise joint distributions are
