@@ -52,7 +52,7 @@
     <cell_volume_first_param>True</cell_volume_first_param>    
     #sbml or cuda
     <model_file>cuda</model_file>
-    <sbml_name>model_deter</sbml_name>
+    <sbml_name>model</sbml_name>
     <parameters>
 		
         <item>
