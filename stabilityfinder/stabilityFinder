@@ -1,3 +1,5 @@
+#!/usr/bin/python2.8
+
 import read_input
 import numpy
 from numpy import random
