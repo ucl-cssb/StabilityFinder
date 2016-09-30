@@ -6,6 +6,7 @@ setup(name='stabilityfinder',
       author='Miriam Leon',
       author_email='miriam.leon.12@ucl.ac.uk',
       url='https://github.com/ucl-cssb/StabilityFinder.git',
+      scripts=['stabilityfinder/stabilityfinder_scr']
       packages=['stabilityfinder'],
       package_data={
           '':['*.R']
