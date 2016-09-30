@@ -23,7 +23,7 @@ Other packages:
 Once these have been downloaded and successfully installed, the following commands should be used to install StabilityFinder:
  
 * $ cd StabilityFinder
-* $ python setup.py install
+* $ python setup.py install --user
  
 This will copy the module StabilityChecker into the lib/pythonXX/site-packages directory,
 where XX corresponds to the python version that was used. An exe=\<dir\> variable should also be added
