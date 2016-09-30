@@ -89,7 +89,7 @@ between the tags.
 * **clustering** The clustering algorithm to be used. The two options are gapstatistic or det.
 * **cell_volume_first_param** True or False. This dictates whether the first parameter is to be ignored.
 * **model file** Whether the model provided is in SBML or cuda format. The two options are sbml and cuda.
-* **sbml name** The name of the SBML file that will be provided. Note that if a cuda file is provided, that must be named model.cu.
+* **sbml name** The name of the SBML file that will be provided. 
 
 * **parameters** The parameters included in the model.
   * **item** One item corresponds to one parameter. The number and order of the items must strictly correspond to those of the parameters in the model provided.
