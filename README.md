@@ -19,6 +19,9 @@ R packages:
 Other packages:
  * cuda-sim
  https://sourceforge.net/projects/cuda-sim/
+ * libsbml (for SBML interface), type:
+ 
+  conda install -c SBMLTeam python-libsbml
  
 Once these have been downloaded and successfully installed, the following commands should be used to install StabilityFinder:
  
