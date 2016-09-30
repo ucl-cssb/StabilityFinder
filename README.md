@@ -51,12 +51,12 @@ Using the package
 The working directory must contain the following files. Each one is described in detail in the section
 following.
 input file.xml The user input file
-run.sh The shell script that will initialise the scripts
+<!---run.sh The shell script that will initialise the scripts--->
 plot posterior.R The R code to plot the results
 model file This can take two formats:
 model.cu Cuda file of the model that is required to have this name
 SBML model This can have any name, as long as this is provided in the input_file.xml.
-Cuda-sim will create the model.cu file using this SBML model.
+Cuda-sim will create the .cu file using this SBML model.
 
 
 
@@ -135,10 +135,7 @@ The plot of the posterior is saved in the posterior.pdf file in the working dire
 
 Running StabilityFinder
 ------------------------
-To run StabilityFinder, and once the input_file.xml file is completed, the run.sh file must be
-executed. The progress of the algorithm can be followed in the my_abc_scan.log file. Once StabilityFinder is finished the posterior can be seen in the posterior.pdf file.
-The phase plots of the populations can be visualised by plotting the contents of the set_resultXX file
-for each parameter set.
+
 
 Examples
 ---------
@@ -152,10 +149,10 @@ directly. This is the model.cu file.
 **Input file**
 The input file is set up as shown in the examples folder. As this model only contains two species, u and v, these are selected for the fit as well as initial condition scan.
 
-**run file**
+<!---**run file**
 The pythonpath must be set to point to the directory in which cuda-sim was installed.
 $export PATH=\<dir\>:$PATH
-In addition, the exe=\<dir\> variable must be set to the directory in which StabilityChecker is installed.
+In addition, the exe=\<dir\> variable must be set to the directory in which StabilityChecker is installed.--->
 
 #####Running the example
 Navigate to the folder containing the example, which is under StabilityFinder/examples/Gardner/Deterministic/
@@ -163,15 +160,19 @@ Navigate to the folder containing the example, which is under StabilityFinder/ex
 The working directory must contain the following:
 * The model.cu file
 * The completed input.xml file
-* The customised run.sh file
+<!---* The customised run.sh file--->
 
 The algorithm is initiated by running the run.sh file. This is done by typing:
 
+python stabilityFinder -i input_file.xml -o results -l log.log
+<!---./run.sh--->
 
-./run.sh
+The progress of the algorithm can be followed in the log.log file. Once StabilityFinder is finished the posterior can be seen in the posterior.pdf file.
+The phase plots of the populations can be visualised by plotting the contents of the set_resultXX file
+for each parameter set.
 
 
-The progress of the algorithm can be followed in the my_abc_scan.log file.
+The progress of the algorithm can be followed in the log.log file.
 
 Once the algorithm has ended, the results can be visualised by running the R files. 
 #####Results
