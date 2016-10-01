@@ -56,7 +56,6 @@ Using the package
 The working directory must contain the following files. Each one is described in detail in the section
 following.
 input file.xml The user input file
-<!---run.sh The shell script that will initialise the scripts--->
 model file This can take two formats:
 model.cu Cuda file of the model that is required to have this name
 SBML model This can have any name, as long as this is provided in the input_file.xml.
@@ -153,10 +152,6 @@ directly. This is the model.cu file.
 **Input file**
 The input file is set up as shown in the examples folder. As this model only contains two species, u and v, these are selected for the fit as well as initial condition scan.
 
-<!---**run file**
-The pythonpath must be set to point to the directory in which cuda-sim was installed.
-$export PATH=\<dir\>:$PATH
-In addition, the exe=\<dir\> variable must be set to the directory in which StabilityChecker is installed.--->
 
 #####Running the example
 Navigate to the folder containing the example, which is under StabilityFinder/examples/Gardner/Deterministic/
@@ -164,12 +159,10 @@ Navigate to the folder containing the example, which is under StabilityFinder/ex
 The working directory must contain the following:
 * The model.cu file
 * The input.xml file
-<!---* The customised run.sh file--->
 
 The algorithm is initiated by typing:
 
 stabilityFinder -i input_file.xml -o results -l log.log
-<!---./run.sh--->
 
 The progress of the algorithm can be followed in the log.log file. Once StabilityFinder is finished the posterior and the phase plots of the populations can be visualised by running the R code supplied. 
  
