@@ -44,6 +44,8 @@ Add the script directory to the path (must be done in each session or added to .
 
 export PATH=\<dir\>/bin:$PATH 
 	
+The user is now ready to run the examples provided with the package. 
+	
 <!---(An exe=\<dir\> variable should also be added
 to the run.sh script pointing the script to the right package installation. Alternatively the path to the
 module can be added to the top of the run.sh file without the need for installation. The path to the
