@@ -6,28 +6,31 @@ Installation
 StabilityFinder has been developed to work on a Linux operating system, with GPU support.
 The following dependencies are essential for the successful implementation of the package, and must be downloaded and installed:
   
+Python 2
+
+https://www.python.org/ftp/python/2.7.12/Python-2.7.12rc1.tgz
+
+R 
+
+https://www.r-project.org/
+  
 Python packages:
-* numpy
-* logging
-* libsbml
-* pycuda
+
+* numpy: https://sourceforge.net/projects/numpy/files/latest/download?source=files
+* pycuda: https://pypi.python.org/packages/e8/3d/4b6b622d8a22cace237abad661a85b289c6f0803ccfa3d2386103307713c/pycuda-2016.1.2.tar.gz
 
 R packages:
-* R
 * ggplot2
 
 Other packages:
- * cuda-sim
- 
- https://sourceforge.net/projects/cuda-sim/
- * libsbml (for SBML interface), type:
- 
-  conda install -c SBMLTeam python-libsbml
+
+ * cuda-sim: https://sourceforge.net/projects/cuda-sim/
+ * libsbml (for SBML interface): http://downloads.sourceforge.net/project/sbml/libsbml/4.0.1/libsbml-4.0.1-src.zip
  
 Once these have been downloaded and successfully installed, the following commands should be used to install StabilityFinder:
- 
-* $ cd StabilityFinder
-* $ python setup.py install --home=\<dir\>
+* git clone https://github.com/ucl-cssb/StabilityFinder.git 
+* cd StabilityFinder
+* python setup.py install --home=\<dir\>
  
 This will copy the module StabilityFinder into the
 
