@@ -18,7 +18,7 @@ library(plyr)
 library(grid)
 
 plot_posterior_distr <- function(limits, param_names, p_values_final){
-
+  
   numb_params = length(param_names)-1
   a=as.numeric(limits[,1])
   b=as.numeric(limits[,2])
@@ -98,5 +98,5 @@ if(args[3] == TRUE){
 
 param_names <- c(param_nam,"weights")
 colnames(p_values_final) = c(param_nam,"weights")
-
+setwd(args[2])
 plot_posterior_distr(limits, param_names, p_values_final)

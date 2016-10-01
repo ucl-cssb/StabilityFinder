@@ -4,7 +4,7 @@ Installation
 -------------
 
 StabilityFinder has been developed to work on a Linux operating system, with GPU support.
-The following dependencies are essential for the successful implementation of the package:
+The following dependencies are essential for the successful implementation of the package, and must be downloaded and installed:
   
 Python packages:
 * numpy
@@ -18,6 +18,7 @@ R packages:
 
 Other packages:
  * cuda-sim
+ 
  https://sourceforge.net/projects/cuda-sim/
  * libsbml (for SBML interface), type:
  
@@ -26,7 +27,7 @@ Other packages:
 Once these have been downloaded and successfully installed, the following commands should be used to install StabilityFinder:
  
 * $ cd StabilityFinder
-* $ python setup.py install —home=\<dir\>
+* $ python setup.py install --home=\<dir\>
  
 This will copy the module StabilityFinder into the
 
@@ -36,6 +37,10 @@ This will copy the module StabilityFinder into the
 
 directories. 
 
+Add the script directory to the path (must be done in each session or added to .bashrc file)
+
+export PATH=\<dir\>/bin:$PATH 
+	
 <!---(An exe=\<dir\> variable should also be added
 to the run.sh script pointing the script to the right package installation. Alternatively the path to the
 module can be added to the top of the run.sh file without the need for installation. The path to the
@@ -52,7 +57,6 @@ The working directory must contain the following files. Each one is described in
 following.
 input file.xml The user input file
 <!---run.sh The shell script that will initialise the scripts--->
-plot posterior.R The R code to plot the results
 model file This can take two formats:
 model.cu Cuda file of the model that is required to have this name
 SBML model This can have any name, as long as this is provided in the input_file.xml.
@@ -159,50 +163,59 @@ Navigate to the folder containing the example, which is under StabilityFinder/ex
 
 The working directory must contain the following:
 * The model.cu file
-* The completed input.xml file
+* The input.xml file
 <!---* The customised run.sh file--->
 
-The algorithm is initiated by running the run.sh file. This is done by typing:
+The algorithm is initiated by typing:
 
-python stabilityFinder -i input_file.xml -o results -l log.log
+stabilityFinder -i input_file.xml -o results -l log.log
 <!---./run.sh--->
 
-The progress of the algorithm can be followed in the log.log file. Once StabilityFinder is finished the posterior can be seen in the posterior.pdf file.
-The phase plots of the populations can be visualised by plotting the contents of the set_resultXX file
-for each parameter set.
+The progress of the algorithm can be followed in the log.log file. Once StabilityFinder is finished the posterior and the phase plots of the populations can be visualised by running the R code supplied. 
+ 
+This is done by navigating to the examples/ folder where the R scripts are placed and typing the following:
 
+Phase plots:
 
-The progress of the algorithm can be followed in the log.log file.
+Rscript plot_phase_space.R Gardner_switch/Deterministic/res/Population_2/
 
-Once the algorithm has ended, the results can be visualised by running the R files. 
+Posterior distribution plot:
+
+Rscript plot_posterior.R Gardner_switch/Deterministic/input_file.xml Gardner_switch/Deterministic/res/ TRUE posterior.pdf
+ 
+The resulting phase plot is in the Gardner_switch/Deterministic/res/Population_2/ directory and the posterior distribution in the Gardner_switch/Deterministic/res/ directory. The arguments required for the R scripts are described in more detail below: 
+ 
 #####Results
 
 ######Plotting the results
-To plot the phase plot type the following command in the directory where the plot_phase_space.R file is:
+The results can be visualised by running the R code supplied in the examples folder. To plot the phase plot type the following command in the directory where the plot_phase_space.R file is:
 
 
-$Rscript plot_phase_space.R last_population_directory_file_path
+$Rscript plot_phase_space.R \<last_population_directory_file_path\>
 
 
-* **last_population_directory_file_path** the file path to the folder of the last population
+* **\<last_population_directory_file_path\>** the file path to the folder of the last population
+
+The resulting phase plots are located in the \<last_population_directory_file_path\> folder. 
 
 To plot the posterior distribution, type the following command in the directory where the plot_posterior.R file is: 
 
 
-$Rscript plot_posterior.R input_file_path file_path_to_results_directory ignore_first_parameter outfile 
+$Rscript plot_posterior.R \<input_file_path\> \<file_path_to_results_directory\> ignore_first_parameter outfile 
 
 
-* **input_file_path** the file path and the name of the input file
-* **file_path_to_results_directory** the file path to the results directory
+
+* **\<input_file_path\>** the file path and the name of the input file
+* **\<file_path_to_results_directory\>** the file path to the results directory
 * **ignore_first_parameter** TRUE/FALSE value. If TRUE, the first parameter is ignored 
 * **outfile** the name of the posterior output file
 
-The posterior is found in the posterior.pdf file. It is the one shown in Figure 5.1. The plots on the
-diagonal represent the marginal distributions for the values of each parameter that were found in the
-final population, thus the ones that can produce bistable behaviour. The pairwise joint distributions are
-found on the side plots.
+The resulting posterior distribution plot is located in the \<file_path_to_results_directory\> folder, unless specified otherwise in the outfile argument. 
 
-![Alt text](examples/Gardner_switch/Deterministic/posterior.png?raw=true "Optional Title")
-The posterior distribution of the Gardner toggle switch produced by StabilityChecker. The
+For the posterior distribution figure, the plots on the diagonal represent the marginal distributions for the values of each parameter that were found in the
+final population, thus the ones that can produce bistable behaviour. The pairwise joint distributions are found on the side plots.
+
+![Alt text](docs/posterior_example.png?raw=true "Optional Title")
+The posterior distribution of the Gardner toggle switch produced by StabilityFinder. The
 marginal distributions of each parameter are found on the diagonal and pairwise joint distributions along
 the sides.
