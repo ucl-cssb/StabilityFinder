@@ -45,7 +45,7 @@ Add the script directory to the path and the lib directory to the Python path (m
 
 export PATH=\<dir\>/bin:$PATH 
 
-export PYTHONPATH=\<dir\>/bin:$PYTHONPATH
+export PYTHONPATH=\<dir\>/lib:$PYTHONPATH
 	
 The user is now ready to run the examples provided with the package. 
 	
