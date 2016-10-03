@@ -44,6 +44,7 @@ directories.
 Add the script directory to the path and the lib directory to the Python path (must be done in each session or added to .bashrc file)
 
 export PATH=\<dir\>/bin:$PATH 
+
 export PYTHONPATH=\<dir\>/bin:$PYTHONPATH
 	
 The user is now ready to run the examples provided with the package. 
@@ -63,7 +64,7 @@ Using the package
 The working directory must contain the following files. Each one is described in detail in the section
 following.
 * input file.xml: The user input file
-* model file: This can take two formats; a cuda file named model.cu of the model that is required to have this name; or an SBML model which can have any name, as long as this is provided in the input_file.xml.
+* model file: This can take two formats; a cuda file named model.cu; or an SBML model which can have any name, as long as this is provided in the input_file.xml.
 cuda-sim will create the .cu file using this SBML model.
 
 
