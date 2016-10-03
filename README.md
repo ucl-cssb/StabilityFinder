@@ -31,7 +31,8 @@ Once these have been downloaded and successfully installed, the following comman
 * git clone https://github.com/ucl-cssb/StabilityFinder.git 
 * cd StabilityFinder
 * python setup.py install --home=\<dir\>
- 
+
+where \<dir\> is the directory where you want to install to. (Note that you can omit the --home=\<dir\> argument and the package will be installed where Python is installed).
 This will copy the module StabilityFinder into the
 
 \<dir\>/lib
@@ -40,9 +41,10 @@ This will copy the module StabilityFinder into the
 
 directories. 
 
-Add the script directory to the path (must be done in each session or added to .bashrc file)
+Add the script directory to the path and the lib directory to the Python path (must be done in each session or added to .bashrc file)
 
 export PATH=\<dir\>/bin:$PATH 
+export PYTHONPATH=\<dir\>/bin:$PYTHONPATH
 	
 The user is now ready to run the examples provided with the package. 
 	
@@ -60,12 +62,9 @@ Using the package
 
 The working directory must contain the following files. Each one is described in detail in the section
 following.
-input file.xml The user input file
-model file This can take two formats:
-model.cu Cuda file of the model that is required to have this name
-SBML model This can have any name, as long as this is provided in the input_file.xml.
-Cuda-sim will create the .cu file using this SBML model.
-
+* input file.xml: The user input file
+* model file: This can take two formats; a cuda file named model.cu of the model that is required to have this name; or an SBML model which can have any name, as long as this is provided in the input_file.xml.
+cuda-sim will create the .cu file using this SBML model.
 
 
 ###The input file
